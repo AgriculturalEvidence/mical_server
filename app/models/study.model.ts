@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 
-const teamSchema = new mongoose.Schema({
-  teamID: {
+const studySchema = new mongoose.Schema({
+  studyID: {
     type: Number,
     required: true,
   },
@@ -16,13 +16,13 @@ const teamSchema = new mongoose.Schema({
 });
 
 // Methods
-teamSchema.method({
+studySchema.method({
 });
 
 // Statics
-teamSchema.static({
+studySchema.static({
 });
 
-const Team = mongoose.model('Team', teamSchema);
+const Team = mongoose.model('Team', studySchema);
 
 export { Team };

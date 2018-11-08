@@ -3,28 +3,36 @@ import 'mocha';
 import { expect } from 'chai';
 import { app } from '../../server';
 import { logger } from '../../utils/logger';
-import { Student } from '../../app/models/student.model';
+import { IYieldDocument, Yield } from '../../app/models/yield.model';
+import { GeoPoint } from '../../app/models/geopoint.model';
 
-describe('student API', () => {
+const yieldEntry = {
+  coords: new GeoPoint([1.5, 3.5]),
+  effectSize: 3,
+  sampleSize: 20,
+  studyID: '11ADAFF',
+};
+
+describe('yield API', () => {
 
   before((done) => {
-    Student.remove({}, () => {
-      logger.trace('Test db: Student collection removed!');
+    Yield.remove({}, () => {
+      logger.trace('Test db: Yield collection removed!');
       done();
     });
   });
 
-  describe('POST /api/student', () => {
-    it('should successfully create a new student', (done) => {
+  describe('POST /api/yield', () => {
+    it('should successfully create a new yield entry', (done) => {
       supertest(app)
-        .post('/api/student')
-        .send({ 'username': 'michael' })
+        .post('/api/yield')
+        .send(yieldEntry)
         .set('Content-Type', 'application/json')
         .end((err: any, res: supertest.Response) => {
           if (err) {
             done(err);
           } else {
-            expect(res.body.username).to.equal('michael');
+            expect(res.body.coords).to.deep.equal(yieldEntry.coords);
             expect(res.status).to.equal(200);
             done();
           }
@@ -32,11 +40,11 @@ describe('student API', () => {
     });
   });
 
-  describe('POST /api/student', () => {
-    it('should fail to create the same student twice', (done) => {
+  describe('POST /api/yield', () => {
+    it('should fail to create the same yield twice', (done) => {
       supertest(app)
-        .post('/api/student')
-        .send({ 'username': 'michael' })
+        .post('/api/yield')
+        .send(yieldEntry)
         .set('Content-Type', 'application/json')
         .end((err: any, res: supertest.Response) => {
           if (err) {
@@ -49,10 +57,10 @@ describe('student API', () => {
     });
   });
 
-  describe('GET /api/student', () => {
-    it('should get valid student', (done) => {
+  describe('GET /api/yield', () => {
+    it('should get valid yield', (done) => {
       supertest(app)
-        .get('/api/student/michael')
+        .get('/api/yield/michael')
         .end((err: any, res: supertest.Response) => {
           if (err) {
             done(err);
@@ -65,10 +73,10 @@ describe('student API', () => {
     });
   });
 
-  describe('GET /api/student', () => {
-    it('should fail to get invalid student', (done) => {
+  describe('GET /api/yield', () => {
+    it('should fail to get invalid yield', (done) => {
       supertest(app)
-        .get('/api/student/nathan')
+        .get('/api/yield/nathan')
         .end((err: any, res: supertest.Response) => {
           if (err) {
             done(err);
@@ -81,10 +89,10 @@ describe('student API', () => {
     });
   });
 
-  describe('PUT /api/student', () => {
-    it('should successfully update existing student', (done) => {
+  describe('PUT /api/yield', () => {
+    it('should successfully update existing yield', (done) => {
       supertest(app)
-        .put('/api/student/michael')
+        .put('/api/yield/michael')
         .send({ 'newUsername': 'nathan' })
         .set('Content-Type', 'application/json')
         .end((err: any, res: supertest.Response) => {
@@ -99,10 +107,10 @@ describe('student API', () => {
     });
   });
 
-  describe('PUT /api/student', () => {
-    it('should fail to update invalid student', (done) => {
+  describe('PUT /api/yield', () => {
+    it('should fail to update invalid yield', (done) => {
       supertest(app)
-        .put('/api/student/michael')
+        .put('/api/yield/michael')
         .send({ 'newUsername': 'nathan' })
         .set('Content-Type', 'application/json')
         .end((err: any, res: supertest.Response) => {
@@ -117,10 +125,10 @@ describe('student API', () => {
     });
   });
 
-  describe('DEL /api/student', () => {
-    it('should successfully delete valid student', (done) => {
+  describe('DEL /api/yield', () => {
+    it('should successfully delete valid yield', (done) => {
       supertest(app)
-        .del('/api/student/nathan')
+        .del('/api/yield/nathan')
         .end((err: any, res: supertest.Response) => {
           if (err) {
             done(err);
@@ -133,10 +141,10 @@ describe('student API', () => {
     });
   });
 
-  describe('DEL /api/student', () => {
-    it('should fail to delete invalid student', (done) => {
+  describe('DEL /api/yield', () => {
+    it('should fail to delete invalid yield', (done) => {
       supertest(app)
-        .del('/api/student/nathan')
+        .del('/api/yield/nathan')
         .end((err: any, res: supertest.Response) => {
           if (err) {
             done(err);
@@ -149,10 +157,10 @@ describe('student API', () => {
     });
   });
 
-  describe('GET /api/student', () => {
-    it('should fail to get invalid student', (done) => {
+  describe('GET /api/yield', () => {
+    it('should fail to get invalid yield', (done) => {
       supertest(app)
-        .get('/api/student/nathan')
+        .get('/api/yield/nathan')
         .end((err: any, res: supertest.Response) => {
           if (err) {
             done(err);

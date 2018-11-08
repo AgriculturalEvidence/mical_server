@@ -1,7 +1,6 @@
 import * as restify from 'restify';
-import * as mongoose from 'mongoose';
-import { Yield, IYieldDocument } from '../models/yield.model';
-import { logger } from '../../utils/logger';
+import { IYieldDocument, Yield } from '../models/yield.model';
+import { GeoPoint } from '../models/geopoint.model';
 
 /**
  * Search for a student by username, and append it to req.params if successful.
@@ -9,8 +8,8 @@ import { logger } from '../../utils/logger';
  */
 function load(req: restify.Request, res: restify.Response, next: restify.Next) {
   Yield.findByUsername(req.params.username)
-    .then((student: IYieldDocument) => {
-      req.params.student = student;
+    .then((yieldData: IYieldDocument) => {
+      req.params.student = yieldData;
       return next();
     })
     .catch((err: any) => next(err));
@@ -26,19 +25,26 @@ function get(req: restify.Request, res: restify.Response, next: restify.Next) {
 }
 
 /**
- * Create a new student from a username, and return it.
- * @property {string} req.params.username - the GitHub username of the student
+ * Create a new entry in yield table, mostly for testing purposes. You should
+ * use @{addStudy}, which is bulk adding
+ * @property {GeoPoint} req.params.coords - geojson point
+ * @property {number} req.params.effectSize - floating-point of the effect size
+ * @property {number} req.params.sampleSize - the size of the sample for the given geopoint
+ * @property {string} req.params.studyID - key of the study in study table
  * @returns {IYieldDocument}
  */
 function create(req: restify.Request, res: restify.Response, next: restify.Next) {
-  const student: IYieldDocument = new Yield({
-    username: req.params.username,
+  const yieldEntry: IYieldDocument = new Yield({
+    coords: req.params.coords,
+    effectSize: req.params.effectSize,
+    sampleSize: req.params.sampleSize,
+    studyID: req.params.studyId,
   });
 
-  return student
+  return yieldEntry
     .save()
-    .then((savedStudent: IYieldDocument) => {
-      res.json(200, savedStudent);
+    .then((savedEntry: IYieldDocument) => {
+      res.json(200, savedEntry);
       return next();
     })
     .catch((err: any) => next(err));

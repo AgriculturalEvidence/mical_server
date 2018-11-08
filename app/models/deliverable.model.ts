@@ -51,6 +51,6 @@ deliverableSchema.method({
 deliverableSchema.static({
 });
 
-const Deliverable = mongoose.model('Student', deliverableSchema);
+const Deliverable = mongoose.model('Yield', deliverableSchema);
 
 export { Deliverable };
