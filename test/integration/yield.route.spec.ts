@@ -1,10 +1,11 @@
 import * as supertest from 'supertest';
 import 'mocha';
 import { expect } from 'chai';
-import { app } from '../../server';
+import { app, db } from '../../server';
 import { logger } from '../../utils/logger';
 import { Yield } from '../../app/models/yield.model';
 import { GeoPoint } from '../../app/models/geopoint.model';
+import './async-dump';
 
 const yieldEntry = {
   coords: new GeoPoint([1.5, 3.5]),
@@ -37,6 +38,11 @@ describe('yield API', () => {
       logger.trace('Test db: Yield collection removed!');
       done();
     });
+  });
+
+  after(function () {
+    app.close();
+    db.close();
   });
 
   describe('POST /api/yield', () => {
@@ -143,68 +149,68 @@ describe('yield API', () => {
     });
   });
 
-});
+  describe('yield API multipoint', () => {
 
-describe('yield API multipoint', () => {
-
-  before((done) => {
-    Yield.remove({}, () => {
-      logger.trace('Test db: Yield collection removed!');
-      done();
+    before((done) => {
+      Yield.remove({}, () => {
+        logger.trace('Test db: Yield collection removed!');
+        done();
+      });
     });
-  });
 
-  describe('POST /api/yield', () => {
-    for (let i = 0; i < numberOfEntries; i++) {
-      it('creates random entries ' + i, (done) => {
+    describe('POST /api/yield', () => {
+      for (let i = 0; i < numberOfEntries; i++) {
+        it('creates random entries ' + i, (done) => {
+          supertest(app)
+            .post('/api/yield')
+            .send({ ...yieldEntry, coords: geoPoints[i] })
+            .set('Content-Type', 'application/json')
+            .end((err: any, res: supertest.Response) => {
+              if (err) {
+                done(err);
+              } else {
+                expect(res.status).to.equal(200);
+                done();
+              }
+            });
+        });
+      }
+
+    });
+
+    describe('GET /api/yield', () => {
+      it('should get valid yield according to coords data', (done) => {
         supertest(app)
-          .post('/api/yield')
-          .send({ ...yieldEntry, coords: geoPoints[i] })
-          .set('Content-Type', 'application/json')
+          .get('/api/yield/' + yieldEntry.studyID +
+            '?area=0,0,10,0,10,10,0,10')
           .end((err: any, res: supertest.Response) => {
             if (err) {
               done(err);
             } else {
+              expect(res.body.length).equal(2);
               expect(res.status).to.equal(200);
               done();
             }
           });
       });
-    }
-
-  });
-
-  describe('GET /api/yield', () => {
-    it('should get valid yield according to coords data', (done) => {
-      supertest(app)
-        .get('/api/yield/' + yieldEntry.studyID +
-          '?area=0,0,10,0,10,10,0,10')
-        .end((err: any, res: supertest.Response) => {
-          if (err) {
-            done(err);
-          } else {
-            expect(res.body.length).equal(2);
-            expect(res.status).to.equal(200);
-            done();
-          }
-        });
     });
-  });
 
-  describe('DEL /api/yield', () => {
-    it('should successfully delete valid yield', (done) => {
-      supertest(app)
-        .del('/api/yield/' + yieldEntry.studyID)
-        .end((err: any, res: supertest.Response) => {
-          if (err) {
-            done(err);
-          } else {
-            expect(res.body).to.equal(numberOfEntries);
-            expect(res.status).to.equal(200);
-            done();
-          }
-        });
+    describe('DEL /api/yield', () => {
+      it('should successfully delete valid yield', (done) => {
+        supertest(app)
+          .del('/api/yield/' + yieldEntry.studyID)
+          .end((err: any, res: supertest.Response) => {
+            if (err) {
+              done(err);
+            } else {
+              expect(res.body).to.equal(numberOfEntries);
+              expect(res.status).to.equal(200);
+              done();
+            }
+          });
+      });
     });
+
   });
 
 });

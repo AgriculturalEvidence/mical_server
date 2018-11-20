@@ -28,4 +28,4 @@ db.once('open', () => {
   });
 });
 
-export { app };
+export { app, db };
