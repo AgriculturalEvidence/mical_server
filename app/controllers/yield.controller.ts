@@ -3,25 +3,41 @@ import { IYieldDocument, Yield } from '../models/yield.model';
 import { GeoPoint } from '../models/geopoint.model';
 
 /**
- * Search for a student by username, and append it to req.params if successful.
- * @returns {IYieldDocument}
+ * Search for a yield study by id, and append it to req.params if successful.
+ * @returns {Array<IYieldDocument>}
  */
 function load(req: restify.Request, res: restify.Response, next: restify.Next) {
-  Yield.findByUsername(req.params.username)
-    .then((yieldData: IYieldDocument) => {
-      req.params.student = yieldData;
-      return next();
-    })
-    .catch((err: any) => next(err));
+  Yield.findByStudy(req.params.studyId, getPolygon(req)).then((doc) => {
+    req.params.docs = doc;
+    return next();
+  }).catch((err) => {
+    next(err);
+  });
+}
+
+function getPolygon(req: restify.Request): number[][] {
+  const area: string = req.params.area;
+  if (!area) {
+    return [];
+  }
+  const points = area.split(',').map(num => parseFloat(num));
+  if (points.length < 6 || points.length % 2) {
+    return [];
+  }
+  let corners: number[][] = [];
+  for (let i = 0; i < points.length; i += 2) {
+    corners.push([points[i], points[i + 1]]);
+  }
+  corners.push(corners[0]);
+  return corners;
 }
 
 /**
- * Get a student.
+ * Get a yield study.
  * @returns {IYieldDocument}
  */
 function get(req: restify.Request, res: restify.Response, next: restify.Next) {
-  res.json(200, req.params.student);
-  return next();
+  res.json(200, req.params.docs);
 }
 
 /**
@@ -38,7 +54,7 @@ function create(req: restify.Request, res: restify.Response, next: restify.Next)
     coords: req.params.coords,
     effectSize: req.params.effectSize,
     sampleSize: req.params.sampleSize,
-    studyID: req.params.studyId,
+    studyID: req.params.studyID,
   });
 
   return yieldEntry
@@ -50,39 +66,23 @@ function create(req: restify.Request, res: restify.Response, next: restify.Next)
     .catch((err: any) => next(err));
 }
 
-/**
- * Update an existing student, and return it.
- * @property {string} req.params.original - the original username
- * @property {string} req.params.new - the new username
- * @returns {IYieldDocument}
- */
-function update(req: restify.Request, res: restify.Response, next: restify.Next) {
-  const student = req.params.student;
-  student.username = req.params.newUsername;
-
-  return student
-    .save()
-    .then((updatedStudent: IYieldDocument) => {
-      res.json(200, updatedStudent);
-      return next();
-    })
-    .catch((err: any) => next(err));
-}
 
 /**
- * Delete a student, and return it. (??)
- * @returns {IYieldDocument}
+ * Delete a whole study given an id
+ * @returns {number} the number of records deleted
  */
 function remove(req: restify.Request, res: restify.Response, next: restify.Next) {
-  const student = req.params.student;
+  const rowsToRemove = req.params.docs;
 
-  return student
-    .remove()
-    .then((deletedStudent: IYieldDocument) => {
-      res.json(200, deletedStudent);
-      return next();
-    })
-    .catch((err: any) => next(err));
+  const promises = rowsToRemove.map((row: IYieldDocument) => {
+    return row.remove();
+  });
+  return Promise.all(promises).then((results: any[]) => {
+    res.json(200, results.length);
+    next();
+  }).catch((r) => {
+    next(r);
+  });
 }
 
-export { get, create, update, remove, load };
+export { get, create, remove, load };

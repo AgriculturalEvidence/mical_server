@@ -13,7 +13,7 @@ interface IYieldDocument extends mongoose.Document {
 
 // Model interface
 interface IYieldModel extends mongoose.Model<IYieldDocument> {
-  findByUsername(username: string): any;
+  findByStudy(studyId: string, areaPoints?: Array<number[]>): Promise<Array<IYieldDocument>>;
 }
 
 const YieldSchema = new Schema({
@@ -31,7 +31,6 @@ const YieldSchema = new Schema({
   effectSize: {
     type: Number,
     required: true,
-    unique: true,
   },
   sampleSize: {
     type: Number,
@@ -42,24 +41,35 @@ const YieldSchema = new Schema({
     default: '-1',
   },
 });
+YieldSchema.index({ location: '2dsphere' });
 
 // Statics
 YieldSchema.statics = {
   /**
   * Get
-  * @param {string} username - The GitHub username of the student.
-  * @returns {Promise<any>} Returns a Promise of the student.
+  * @param {string} studyId - The studyId that we are trying to query.
+  * @param {[]number} areaPoints a set of points greater than 3 that represents an area on the map
+  * @returns {Promise<Array<IYieldDocument>>} Returns a Promise of the datapoints.
   */
   // todo vpineda figure out which type of queries we want to compute
-  findByUsername: function (username: string): Promise<IYieldDocument> {
-    return this
-      .find({ username: username })
-      .exec()
-      .then((student: Array<IYieldModel>) => {
-        if (student && student.length) {
-          return student[0];
+  findByStudy: function (studyId: string,
+                         areaPoints?: Array<number[]>): Promise<Array<IYieldDocument>> {
+    let q = this.find({ studyID: studyId });
+
+    if (areaPoints && areaPoints.length > 2) {
+      const polygon = {
+        'type' : 'Polygon',
+        'coordinates' : [areaPoints]
+      };
+      q.where('coords').within(polygon);
+    }
+
+    return q.exec()
+      .then((dataPoints: Array<IYieldModel>) => {
+        if (dataPoints && dataPoints.length) {
+          return dataPoints;
         }
-        return Promise.reject('errrrr');
+        return Promise.reject('It seems like the study doesn\'t exist or there is no data');
       });
   }
 };

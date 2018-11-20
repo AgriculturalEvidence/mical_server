@@ -8,12 +8,7 @@ import { logger } from '../../utils/logger';
  * @returns {IYieldDocument}
  */
 function load(req: restify.Request, res: restify.Response, next: restify.Next) {
-  Yield.findByUsername(req.params.username)
-    .then((student: IYieldDocument) => {
-      req.params.student = student;
-      return next();
-    })
-    .catch((err: any) => next(err));
+  next();
 }
 
 /**

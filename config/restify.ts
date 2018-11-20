@@ -12,6 +12,7 @@ const app: restify.Server = restify.createServer({ name: config.name });
 
 // parse the body of the request into req.params
 app.use(restify.bodyParser());
+app.use(restify.queryParser());
 
 // user-defined middleware
 app.use((req: any, res: any, next: any) => {
