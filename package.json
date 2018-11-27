@@ -14,8 +14,10 @@
     "@types/restify": "^2.0.36",
     "@types/sinon": "^1.16.34",
     "@types/supertest": "^2.0.0",
+    "@types/xlsx": "0.0.36",
     "mongoose": "^4.7.5",
-    "restify": "^4.1.1"
+    "restify": "^4.1.1",
+    "xlsx": "^0.14.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",

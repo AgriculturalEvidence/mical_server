@@ -1,14 +1,23 @@
 import mongoose = require('mongoose');
-import {config} from './config/env';
-import {app} from './config/restify';
-import {logger} from './utils/logger';
+import { config } from './config/env';
+import { app } from './config/restify';
+import { logger } from './utils/logger';
 
 // use native ES6 promises instead of mongoose promise library
 mongoose.Promise = global.Promise;
 
 // connect to mongodb
-const options = { server: { socketOptions: { keepAlive: 1 } }, auth: { authdb: 'admin'}, user: config.dbUser, pass: config.dbPass };
-const db: mongoose.Connection = mongoose.connect(config.db, options).connection;
+const options = {
+  keepAlive: 1,
+  auth: {
+    authdb: 'admin'
+  },
+  user: config.dbUser,
+  pass: config.dbPass,
+  useMongoClient: true,
+};
+
+const db = <any>mongoose.connect(config.db, options);
 
 // print mongoose logs in dev and test env
 if (config.debug) {

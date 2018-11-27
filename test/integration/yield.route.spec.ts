@@ -6,6 +6,7 @@ import { logger } from '../../utils/logger';
 import { Yield } from '../../app/models/yield.model';
 import { GeoPoint } from '../../app/models/geopoint.model';
 import './async-dump';
+import * as mongoose from "mongoose";
 
 const yieldEntry = {
   coords: new GeoPoint([1.5, 3.5]),
@@ -40,9 +41,9 @@ describe('yield API', () => {
     });
   });
 
-  after(function () {
+  after(function (done) {
     app.close();
-    db.close();
+    mongoose.connection.close(done);
   });
 
   describe('POST /api/yield', () => {

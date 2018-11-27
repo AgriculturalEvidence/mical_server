@@ -33,7 +33,7 @@ app.use((req: any, res: any, next: any) => {
 });
 
 // add route handlers
-console.log( pathToRoutes, "\n");
+console.log( pathToRoutes, '\n');
 fs.readdir(pathToRoutes, (err: any, files: string[]) => {
   if (err) {
     throw new Error(err);
