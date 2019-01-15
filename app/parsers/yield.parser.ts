@@ -27,10 +27,10 @@ interface ColumDesc {
 }
 
 function toColumnIndex(n: number) {
-  let str = n.toString(26);
-  let arr = [];
-  for (var i = 0; i < str.length; i++) {
-    arr.push(String.fromCharCode(parseInt(str[i], 26) + 'A'.charCodeAt(0)));
+  var arr = [];
+  while (n >= 0) {
+    arr.push( String.fromCharCode(0x41 + (n % 26)));
+    n = Math.floor(n /26) -1;
   }
   return arr.join("");
 }
@@ -48,7 +48,7 @@ abstract class Parser {
       for (let colPtr = 0; colPtr < cols.length; colPtr++) {
         let cell = ws[('A' + colPtr) + "1"]
         if (cell.t == 't' && colNames[cell.V]) {
-          columns[cell.V] = [ws, 'A' + colPtr];
+          columns[cell.V] = [ws, toColumnIndex(colPtr)];
         }
       }
     }
@@ -70,8 +70,8 @@ class YieldParser extends Parser{
 
   run(): void {
     let valRes = this.validate();
-
-    XLSX.readFile(this.yieldJob.fileName)
+    let file = XLSX.readFile(this.yieldJob.fileName);
+    let colNamesObj = this.yieldJob.columnMapping.
   }
 }
 
