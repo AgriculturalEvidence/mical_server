@@ -98,7 +98,7 @@ async function run() {
     console.log("Validating dataset");
     parser.validate();
 
-    console.log("Running dataset");
+    console.log("Running parsing operation");
     parser.run();
 
   }
