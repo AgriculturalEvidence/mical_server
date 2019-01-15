@@ -49,4 +49,18 @@ if (env === 'production') {
   config.debug = false;
 }
 
-export { config };
+const defaultYieldParsingParams = {
+  fileName: "yield.xlsx",
+  columnMapping: {
+    xCoords: "x",
+    yCoords: "y",
+    effectSize: "EffectSize",
+    sampleSize: "SampleSize",
+  }
+};
+
+const parsingConfig = {
+  yieldParams: defaultYieldParsingParams
+};
+
+export { config, parsingConfig };

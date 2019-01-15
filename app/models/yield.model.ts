@@ -16,6 +16,8 @@ interface IYieldModel extends mongoose.Model<IYieldDocument> {
   findByStudy(studyId: string, areaPoints?: Array<number[]>): Promise<Array<IYieldDocument>>;
 }
 
+const YieldType = 'YIELD';
+
 const YieldSchema = new Schema({
   coords: {
     type: {
@@ -76,4 +78,4 @@ YieldSchema.statics = {
 
 const Yield: IYieldModel = <IYieldModel>mongoose.model('Yield', YieldSchema);
 
-export { Yield, IYieldDocument };
+export { Yield, IYieldDocument, YieldType };
