@@ -4,7 +4,6 @@ import { expect } from 'chai';
 import { app, db } from '../../server';
 import { logger } from '../../utils/logger';
 import { EffectSizeScale, Study } from '../../app/models/studies.model';
-import './async-dump';
 import * as mongoose from 'mongoose';
 
 const studyEntry = {

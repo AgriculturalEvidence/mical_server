@@ -1,8 +1,9 @@
-import {Parser, YieldParser} from './app/parsers/yield.parser';
+import {YieldParser} from './app/parsers/yield.parser';
 import * as readline from 'readline';
 import {EffectSizeScale, Study} from './app/models/studies.model';
 import {parsingConfig} from './config/env';
 import {YieldType} from './app/models/yield.model';
+import { Parser } from './app/parsers/paper.parser';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -94,9 +95,6 @@ async function run() {
       default:
         console.log("couldn't parse answer ")
     }
-
-    console.log("Validating dataset");
-    parser.validate();
 
     console.log("Running parsing operation");
     parser.run();
