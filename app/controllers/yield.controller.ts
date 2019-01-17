@@ -1,12 +1,14 @@
 import * as restify from 'restify';
 import { IYieldDocument, Yield } from '../models/yield.model';
 import { GeoPoint } from '../models/geopoint.model';
+import {logger} from '../../utils/logger';
 
 /**
  * Search for a yield study by id, and append it to req.params if successful.
  * @returns {Array<IYieldDocument>}
  */
 function load(req: restify.Request, res: restify.Response, next: restify.Next) {
+  logger.info("Yield: Load request with params: "+ JSON.stringify(req.params));
   Yield.findByStudy(req.params.studyId, getPolygon(req)).then((doc) => {
     req.params.docs = doc;
     return next();
@@ -50,6 +52,7 @@ function get(req: restify.Request, res: restify.Response, next: restify.Next) {
  * @returns {IYieldDocument}
  */
 function create(req: restify.Request, res: restify.Response, next: restify.Next) {
+  logger.info("Yield: Create request with params: " + JSON.stringify(req.params));
   const yieldEntry: IYieldDocument = new Yield({
     coords: req.params.coords,
     effectSize: req.params.effectSize,
@@ -72,6 +75,7 @@ function create(req: restify.Request, res: restify.Response, next: restify.Next)
  * @returns {number} the number of records deleted
  */
 function remove(req: restify.Request, res: restify.Response, next: restify.Next) {
+  logger.info("Yield: Remove request with params: " + JSON.stringify(req.params));
   const rowsToRemove = req.params.docs;
 
   const promises = rowsToRemove.map((row: IYieldDocument) => {
