@@ -18,7 +18,8 @@ let parseOpts = {
             "xCoords": "X-coord deg",
             "yCoords": "Y-coord deg",
             "effectSize": "Yield ic 1",
-            "sampleSize": "N sc 1"
+            "sampleSize": "N sc 1",
+            "studyId": "Study#"
     }
 };
 
@@ -72,7 +73,39 @@ describe("yield parsing integration test", () => {
             })
         }
         yp.run().then(validation, (err) => done("Coudn't add rows! " + err))
-    })
+    });
+
+    it ("works with csv files", function (done) {
+      let parseOpts = {
+        "studyDef": new Study(),
+        "fileName": "./test/parsing/data/DataForSubmitting.csv",
+        "columnMapping": {
+          "xCoords": "X_coord",
+          "yCoords": "Y_coord",
+          "effectSize": "log ratio",
+          "sampleSize": "sampleSize",
+          "studyId": "Study#"
+        }
+      };
+
+      parseOpts.studyDef = new Study({
+        "id": "13",
+        "name": "Orgainic",
+        "type": "YIELD",
+        "effectScale": 0,
+        "people": "Other",
+        "link": "google.com"
+      });
+
+      let yp = new YieldParser(parseOpts);
+      function validation() {
+        Yield.findByStudy("").then((values) => {
+          console.log(values.length);
+          done();
+        })
+      }
+      yp.run().then(validation, (err) => done("Coudn't add rows! " + err))
+    });
 
     after(function (done) {
         app.close();

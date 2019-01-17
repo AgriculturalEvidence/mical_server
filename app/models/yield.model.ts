@@ -56,7 +56,7 @@ YieldSchema.statics = {
   // todo vpineda figure out which type of queries we want to compute
   findByStudy: function (studyId: string,
                          areaPoints?: Array<number[]>): Promise<Array<IYieldDocument>> {
-    let q = this.find({ studyID: studyId });
+    let q = this.find(studyId ? { studyID: studyId } : {});
 
     if (areaPoints && areaPoints.length > 2) {
       const polygon = {

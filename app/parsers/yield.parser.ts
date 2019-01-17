@@ -15,16 +15,23 @@ interface YieldJob extends ParseJob {
     yCoords: string,
     effectSize: string,
     sampleSize: string,
+    studyId: string,
     [key: string]: string,
   };
 }
 
-// interface IYieldDocument extends mongoose.Document {
-//   coords: GeoPoint;
-//   effectSize: number;
-//   sampleSize: number;
-//   studyID: string;
-// }
+function validRow(newData: any) {
+  if (!newData.coords.coordinates.every(
+    (v: any) => typeof v == 'number')) {
+    console.log("Dropping: " + JSON.stringify(newData));
+    return false;
+  }
+  if (typeof newData.effectSize !== 'number') {
+    return false;
+  }
+
+  return typeof newData.sampleSize === 'number';
+}
 
 class YieldParser extends Parser {
 
@@ -33,9 +40,9 @@ class YieldParser extends Parser {
   }
 
   prepareRows(ws: WorkSheet, colInfo: ColumDesc) : Array<IYieldDocument> {
-    let [numCols, numRows] = parseRef(ws["!ref"]);
-    let colInfoKeys = Object.keys(colInfo);
+    let [_, numRows] = parseRef(ws["!ref"]);
     let rows = [];
+
     for(let rowIdx = 2; rowIdx <= numRows; rowIdx ++) {
       let newData = {
         coords: {
@@ -45,10 +52,13 @@ class YieldParser extends Parser {
         },
         effectSize: ws[colInfo.effectSize + rowIdx].v,
         sampleSize: ws[colInfo.sampleSize + rowIdx].v,
-        studyID: this.yieldJob.studyDef.id
+        studyID: this.yieldJob.studyDef.id + "_" + ws[colInfo.studyId + rowIdx].v
       }
-      let newRow = new Yield(newData)
-      rows.push(newRow);
+      if (validRow(newData)) {
+        let newRow = new Yield(newData)
+        rows.push(newRow);
+      }
+
     }
     return rows;
   }

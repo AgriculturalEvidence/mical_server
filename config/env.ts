@@ -56,6 +56,7 @@ const defaultYieldParsingParams = {
     yCoords: "y",
     effectSize: "EffectSize",
     sampleSize: "SampleSize",
+    studyID: "Study#"
   }
 };
 
