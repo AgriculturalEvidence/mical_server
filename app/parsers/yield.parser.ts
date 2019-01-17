@@ -38,8 +38,11 @@ class YieldParser extends Parser {
     let rows = [];
     for(let rowIdx = 2; rowIdx <= numRows; rowIdx ++) {
       let newData = {
-        coords: new GeoPoint([ws[colInfo.xCoords + rowIdx].v, 
-          ws[colInfo.yCoords + rowIdx].v]),
+        coords: {
+          type: 'Point',
+          coordinates: [ws[colInfo.xCoords + rowIdx].v, 
+          ws[colInfo.yCoords + rowIdx].v],
+        },
         effectSize: ws[colInfo.effectSize + rowIdx].v,
         sampleSize: ws[colInfo.sampleSize + rowIdx].v,
         studyID: this.yieldJob.studyDef.id
@@ -59,10 +62,7 @@ class YieldParser extends Parser {
     }
     
     let rows = this.prepareRows(ws, cols);
-    
-    return Promise.all(rows.map(r => {
-      return r.save()
-    })).then(() => true, () => false)
+    return Promise.all(rows.map(r => r.save())).then(() => true)
   }
 }
 

@@ -71,6 +71,11 @@ describe("yield parsing integration test", () => {
                 done();
             })
         }
-        yp.run().then(validation, () => done("Coudn't add rows!"))
+        yp.run().then(validation, (err) => done("Coudn't add rows! " + err))
     })
+
+    after(function (done) {
+        app.close();
+        mongoose.connection.close(done);
+    });
 })

@@ -1,4 +1,5 @@
-# MiCal Server
+# MiCal API Server
+The API server for MiCal application
 
 ## Requirements
 
@@ -6,11 +7,15 @@
 * [mongodb](http://mongodb.org)
 
 ## Getting Started
-# Install dependencies
+#### Install dependencies
 npm install
 
-# Run tests
+#### Run tests
 npm run test
 
-# Start the server
+#### Start the server
 npm run start
+
+
+### Docker instructions
+docker stack deploy -c .\stack.yml mongo

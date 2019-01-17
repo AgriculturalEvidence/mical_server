@@ -40,11 +40,6 @@ describe('yield API', () => {
     });
   });
 
-  after(function (done) {
-    app.close();
-    mongoose.connection.close(done);
-  });
-
   describe('POST /api/yield', () => {
     it('should successfully create a new yield entry', (done) => {
       supertest(app)
