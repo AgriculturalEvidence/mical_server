@@ -21,11 +21,11 @@ const debug: any = process.env.DEBUG || false;
 
 // default settings are for dev environment
 const config: ConfigSettings = {
-  name: 'ClassPortal API',
+  name: 'MiCal API',
   env: env,
   debug: debug,
   root: path.join(__dirname, '/..'),
-  port: 0,
+  port: 8888,
   db: 'mongodb://localhost:27017/dev',
   dbUser: 'root',
   dbPass: 'example',
