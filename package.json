@@ -1,11 +1,11 @@
 {
-  "name": "classportal-api",
-  "description": "classportal api",
-  "version": "1.0.0",
-  "author": "michael sargent",
+  "name": "MiCal",
+  "description": "MiCal server API",
+  "version": "0.1.0",
+  "author": "Victor Pineda",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ubccpsc/classportal-api"
+    "url": "https://github.com/AgriculturalEvidence/mical_server"
   },
   "dependencies": {
     "@types/chai": "^3.5.2",
@@ -15,6 +15,8 @@
     "@types/sinon": "^1.16.34",
     "@types/supertest": "^2.0.0",
     "@types/xlsx": "0.0.36",
+    "@types/geojson": "^7946.0.5",
+    "geojson": "^0.5.0",
     "mongoose": "^4.7.5",
     "restify": "^4.1.1",
     "xlsx": "^0.14.1"
@@ -35,6 +37,7 @@
     "build": "node_modules/.bin/tsc",
     "test": "npm run build && NODE_ENV='test' node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha test/**/*.spec.js",
     "cover": "npm run test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "start": "npm run build && node server.js"
+    "start": "npm run build && node server.js",
+    "parse": "npm run build && node parse.js"
   }
 }

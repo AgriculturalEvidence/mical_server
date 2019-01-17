@@ -5,7 +5,6 @@ import { app, db } from '../../server';
 import { logger } from '../../utils/logger';
 import { Yield } from '../../app/models/yield.model';
 import { GeoPoint } from '../../app/models/geopoint.model';
-import './async-dump';
 import * as mongoose from "mongoose";
 
 const yieldEntry = {
