@@ -1,10 +1,11 @@
 import * as mongoose from 'mongoose';
 import { GeoPoint } from './geopoint.model';
+import {IOutcomeTableDocument, IOutcomeTableModel} from './table.model';
 
 const Schema = mongoose.Schema;
 
 // Document interface
-interface IYieldDocument extends mongoose.Document {
+interface IYieldDocument extends mongoose.Document, IOutcomeTableDocument {
   coords: GeoPoint;
   effectSize: number;
   sampleSize: number;
@@ -12,7 +13,7 @@ interface IYieldDocument extends mongoose.Document {
 }
 
 // Model interface
-interface IYieldModel extends mongoose.Model<IYieldDocument> {
+interface IYieldModel extends mongoose.Model<IYieldDocument>, IOutcomeTableModel<IYieldDocument> {
   findByStudy(studyId: string, areaPoints?: Array<number[]>): Promise<Array<IYieldDocument>>;
 }
 
@@ -42,6 +43,10 @@ const YieldSchema = new Schema({
     type: String,
     default: '-1',
   },
+  interventionType: {
+    type: Number,
+    required: true,
+  }
 });
 YieldSchema.index({ location: '2dsphere' });
 
@@ -67,13 +72,37 @@ YieldSchema.statics = {
     }
 
     return q.exec()
-      .then((dataPoints: Array<IYieldModel>) => {
+      .then((dataPoints: Array<IYieldDocument>) => {
         if (dataPoints && dataPoints.length) {
           return dataPoints;
         }
         return Promise.reject('It seems like the study doesn\'t exist or there is no data');
       });
-  }
+  },
+
+  findByInterventionType(interventionKey: number): Promise<IYieldDocument[]> {
+    let q = this.find(interventionKey);
+
+    return q.exec()
+      .then((dataPoints: Array<IYieldDocument>) => {
+        if (dataPoints && dataPoints.length) {
+          return dataPoints;
+        }
+        return Promise.reject('It seems like the study doesn\'t contain data fo that intervention');
+      });
+  },
+
+  getAllInterventionTypes(): Promise<number[]> {
+    let q = this.distinct("interventionType");
+
+    return q.exec()
+      .then((dataPoints: Array<IYieldDocument>) => {
+        if (dataPoints && dataPoints.length) {
+          return dataPoints.map((row) => row.interventionType);
+        }
+        return Promise.reject('It seems like the study doesn\'t contain data');
+      });
+  },
 };
 
 const Yield: IYieldModel = <IYieldModel>mongoose.model('Yield', YieldSchema);

@@ -4,7 +4,6 @@ import { expect } from 'chai';
 import { app, db } from '../../server';
 import { logger } from '../../utils/logger';
 import { Intervention } from '../../app/models/intervention.model';
-import { GeoPoint } from '../../app/models/geopoint.model';
 import * as mongoose from "mongoose";
 
 const interventionEntry = {
