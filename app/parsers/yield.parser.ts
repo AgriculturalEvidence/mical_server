@@ -70,7 +70,6 @@ class YieldParser extends Parser {
       console.log("Couldn't find all cols, aborting!");
       return false;
     }
-    
     let rows = this.prepareRows(ws, cols);
     return Promise.all(rows.map(r => r.save())).then(() => true)
   }

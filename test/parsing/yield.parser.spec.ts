@@ -56,7 +56,8 @@ describe("yield parsing integration test", () => {
             "xCoords": "T",
             "yCoords": "V",
             "effectSize": "BK",
-            "sampleSize": "BE"
+            "sampleSize": "BE",
+            "studyId": "A"
         }
         let ans = yp.prepareRows(wb.Sheets[wb.SheetNames[0]], columMP);
         expect(ans.length).eq(746)
@@ -67,10 +68,10 @@ describe("yield parsing integration test", () => {
     it ("inserts all rows" , (done) => {
         let yp = new YieldParser(parseOpts);
         function validation() {
-            Yield.findByStudy(parseOpts.studyDef.id).then((values) => {
+            Yield.findByStudy(parseOpts.studyDef.id + "_1").then((values) => {
                 console.log(values.length);
                 done();
-            })
+            }, (err) => done(err));
         }
         yp.run().then(validation, (err) => done("Coudn't add rows! " + err))
     });

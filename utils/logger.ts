@@ -5,21 +5,18 @@ import { config } from '../config/env';
 interface LoggerSettings {
   name: string;
   streams: Array<Object>;
+  serializers: any;
 }
 
-const infoStream = new stream.Writable();
-infoStream.writable = true;
-infoStream.write = (info: any): boolean => {
-  console.log(JSON.parse(info).msg);
-  return true;
-};
+let infoStream = process.stdout;
 
 let settings: LoggerSettings = {
   name: config.env,
-  streams: [{ level: 'error', path: `error.log` }]
+  serializers: bunyan.stdSerializers,
+  streams: [{ level: 'error', path: `error.log` }, { level: 'error', stream: infoStream }]
 };
 
-if (config.env === 'dev') {
+if (config.env === 'dev' || config.env == 'development') {
   settings.streams.push({ level: 'info', stream: infoStream });
 }
 
