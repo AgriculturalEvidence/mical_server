@@ -39,7 +39,7 @@ function getPolygon(req: restify.Request): number[][] {
  * @returns {IYieldDocument}
  */
 function get(req: restify.Request, res: restify.Response, next: restify.Next) {
-  logger.info("Answering response from ", req.rawHeaders, " with ", req.params.docs.length, " rows.")
+  logger.info("Answering response with ", req.params.docs.length, " rows.")
   res.json(200, req.params.docs);
 }
 
