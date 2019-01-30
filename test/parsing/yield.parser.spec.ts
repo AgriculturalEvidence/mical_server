@@ -9,6 +9,7 @@ import { YieldParser } from '../../app/parsers/yield.parser';
 import { equal } from 'assert';
 import { WorkBook } from 'xlsx/types';
 import { Yield } from '../../app/models/yield.model';
+import { Intervention } from '../../app/models/intervention.model';
 const XLSX = require('xlsx');
 
 let parseOpts = {
@@ -19,7 +20,8 @@ let parseOpts = {
             "yCoords": "Y-coord deg",
             "effectSize": "Yield ic 1",
             "sampleSize": "N sc 1",
-            "studyId": "Study#"
+            "studyId": "Study#",
+            "interventionType": "intType",
     }
 };
 
@@ -32,8 +34,36 @@ parseOpts.studyDef = new Study({
     "link": "google.com"
 });
 
+let mockInterventions = [new Intervention({
+    key: 1,
+    sKey: "organic",
+    title: "Orgainc Effect Size",
+    desc: "How much does orgainc increase intervention",
+    denom: "Lower interventions",
+    numerator: "Higher interventions",
+}), new Intervention({
+    key: 2,
+    sKey: "biodiversity",
+    title: "Orgainc Effect Size",
+    desc: "How much does orgainc increase intervention",
+    denom: "Lower interventions",
+    numerator: "Higher interventions",
+})];
+
 
 describe("yield parsing integration test", () => {
+
+    before(async () => {
+        await Intervention.remove({}, () => {
+          logger.trace('Test db: intervention collection removed!');
+        });
+
+        await Yield.remove({}, () => {
+            logger.trace('Test db: yield collection removed!');
+        });
+        mockInterventions.forEach(i => i.save());
+      });
+
     describe("find the right columns", () => {
         it ("finds for TND", () => {
             let yp = new YieldParser(parseOpts);
@@ -49,7 +79,7 @@ describe("yield parsing integration test", () => {
         })
     })
 
-    it("creates all of the rows", () => {
+    it("creates all of the rows", async () => {
         let yp = new YieldParser(parseOpts);
         let wb: WorkBook = XLSX.readFile(parseOpts.fileName);
         let columMP = {
@@ -57,9 +87,10 @@ describe("yield parsing integration test", () => {
             "yCoords": "V",
             "effectSize": "BK",
             "sampleSize": "BE",
-            "studyId": "A"
+            "studyId": "A",
+            "interventionType": "BY",
         }
-        let ans = yp.prepareRows(wb.Sheets[wb.SheetNames[0]], columMP);
+        let ans = await yp.prepareRows(wb.Sheets[wb.SheetNames[0]], columMP);
         expect(ans.length).eq(746)
 
         expect(ans[0].effectSize).eq(340.09)
@@ -85,7 +116,8 @@ describe("yield parsing integration test", () => {
           "yCoords": "Y_coord",
           "effectSize": "log ratio",
           "sampleSize": "sampleSize",
-          "studyId": "Study#"
+          "studyId": "Study#",
+          "interventionType": "intType"
         }
       };
 

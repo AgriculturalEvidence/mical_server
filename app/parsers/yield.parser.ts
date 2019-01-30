@@ -5,6 +5,8 @@ import {GeoPoint} from '../models/geopoint.model';
 import {Parser, ParseJob, ColumDesc} from './paper.parser'
 import {ExcelDataType, WorkBook, WorkSheet} from 'xlsx';
 import { parseRef } from '../util/excel.helpers';
+import { Intervention } from '../models/intervention.model';
+import { logger } from '../../utils/logger';
 const XLSX = require('xlsx');
 
 interface YieldJob extends ParseJob {
@@ -16,17 +18,25 @@ interface YieldJob extends ParseJob {
     effectSize: string,
     sampleSize: string,
     studyId: string,
+    interventionType: string
     [key: string]: string,
   };
 }
 
 function validRow(newData: any) {
+  if (newData === null) {
+    return false;
+  }
   if (!newData.coords.coordinates.every(
     (v: any) => typeof v == 'number')) {
     console.log("Dropping: " + JSON.stringify(newData));
     return false;
   }
   if (typeof newData.effectSize !== 'number') {
+    return false;
+  }
+
+  if (typeof newData.interventionType !== 'number') {
     return false;
   }
 
@@ -39,27 +49,35 @@ class YieldParser extends Parser {
     super();
   }
 
-  prepareRows(ws: WorkSheet, colInfo: ColumDesc) : Array<IYieldDocument> {
+  prepareRows(ws: WorkSheet, colInfo: ColumDesc) : Promise<IYieldDocument[]> {
     let [_, numRows] = parseRef(ws["!ref"]);
-    let rows = [];
+    let rowPromises = [];
 
     for(let rowIdx = 2; rowIdx <= numRows; rowIdx ++) {
-      let newData = {
-        coords: {
-          type: 'Point',
-          coordinates: [ws[colInfo.xCoords + rowIdx].v, 
-          ws[colInfo.yCoords + rowIdx].v],
-        },
-        effectSize: ws[colInfo.effectSize + rowIdx].v,
-        sampleSize: ws[colInfo.sampleSize + rowIdx].v,
-        studyID: this.yieldJob.studyDef.id + "_" + ws[colInfo.studyId + rowIdx].v
-      }
-      if (validRow(newData)) {
-        let newRow = new Yield(newData)
-        rows.push(newRow);
-      }
-
+      let newRowPromise = Intervention.findByStringKey(ws[colInfo.interventionType + rowIdx].v).then(interventionRow => {
+        return {
+          coords: {
+            type: 'Point',
+            coordinates: [ws[colInfo.xCoords + rowIdx].v, 
+            ws[colInfo.yCoords + rowIdx].v],
+          },
+          effectSize: ws[colInfo.effectSize + rowIdx].v,
+          sampleSize: ws[colInfo.sampleSize + rowIdx].v,
+          studyID: this.yieldJob.studyDef.id + "_" + ws[colInfo.studyId + rowIdx].v,
+          interventionType: interventionRow.key
+        };
+      }).catch((err) => {
+        console.log("Cannot find intervention type for row, ", err);
+        return null;
+      }).then((row) => {
+        if(validRow(row)) return {success:true, r: row};
+        else return {success:false, r: row}
+      });
+      rowPromises.push(newRowPromise);
     }
+    let rows = Promise.all(rowPromises).then((rows) => {
+      return rows.filter(v => v.success).map(v => v.r);
+    })
     return rows;
   }
 
@@ -71,7 +89,9 @@ class YieldParser extends Parser {
       return false;
     }
     let rows = this.prepareRows(ws, cols);
-    return Promise.all(rows.map(r => r.save())).then(() => true)
+    return rows.then(rs => 
+      Promise.all(rs.map(r => new Yield(r).save()))
+    ).then(() => true)
   }
 }
 

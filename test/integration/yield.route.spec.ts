@@ -12,6 +12,7 @@ const yieldEntry = {
   effectSize: 3,
   sampleSize: 20,
   studyID: '11ADAFF',
+  interventionType: 1,
 };
 
 

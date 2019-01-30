@@ -50,6 +50,7 @@ function get(req: restify.Request, res: restify.Response, next: restify.Next) {
  * @property {number} req.params.effectSize - floating-point of the effect size
  * @property {number} req.params.sampleSize - the size of the sample for the given geopoint
  * @property {string} req.params.studyID - key of the study in study table
+ * @property {string} req.params.interventionType - the integer key of the intervention type
  * @returns {IYieldDocument}
  */
 function create(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -58,6 +59,7 @@ function create(req: restify.Request, res: restify.Response, next: restify.Next)
     effectSize: req.params.effectSize,
     sampleSize: req.params.sampleSize,
     studyID: req.params.studyID,
+    interventionType: parseInt(req.params.interventionType, 10)
   });
 
   return yieldEntry

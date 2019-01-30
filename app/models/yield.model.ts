@@ -10,6 +10,7 @@ interface IYieldDocument extends mongoose.Document, IOutcomeTableDocument {
   effectSize: number;
   sampleSize: number;
   studyID: string;
+  interventionType: string;
 }
 
 // Model interface
@@ -62,7 +63,6 @@ YieldSchema.statics = {
   findByStudy: function (studyId: string,
                          areaPoints?: Array<number[]>): Promise<Array<IYieldDocument>> {
     let q = this.find(studyId ? { studyID: studyId } : {});
-
     if (areaPoints && areaPoints.length > 2) {
       const polygon = {
         'type' : 'Polygon',

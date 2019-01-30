@@ -48,7 +48,6 @@ const InterventionSchema = new Schema({
     default: "",
   },
 }, {
-  autoIndex: false,
 });
 InterventionSchema.index({ key: 1}, {unique: true});
 
