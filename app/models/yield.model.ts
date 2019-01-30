@@ -96,9 +96,9 @@ YieldSchema.statics = {
     let q = this.distinct("interventionType");
 
     return q.exec()
-      .then((dataPoints: Array<IYieldDocument>) => {
+      .then((dataPoints: Array<number>) => {
         if (dataPoints && dataPoints.length) {
-          return dataPoints.map((row) => row.interventionType);
+          return dataPoints;
         }
         return Promise.reject('It seems like the study doesn\'t contain data');
       });

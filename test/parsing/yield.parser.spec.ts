@@ -101,6 +101,9 @@ describe("yield parsing integration test", () => {
         function validation() {
             Yield.findByStudy(parseOpts.studyDef.id + "_1").then((values) => {
                 console.log(values.length);
+                return Yield.getAllInterventionTypes()
+            }, (err) => done(err)).then((types) => {
+                expect(types).to.deep.eq([1])
                 done();
             }, (err) => done(err));
         }

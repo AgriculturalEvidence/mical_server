@@ -30,7 +30,7 @@ function getTableInterventions(req: restify.Request, res: restify.Response, next
   const tableId = req.params.table;
   const tableModel = TableMap[tableId];
   if (!tableModel) {
-    return next("Table doesn't exist!");
+    return res.json(404, "Table doesn't exist!");
   }
   const intPromise = tableModel.getAllInterventionTypes();
   const interventionRows = intPromise.then((interventionIds) => {
@@ -39,7 +39,10 @@ function getTableInterventions(req: restify.Request, res: restify.Response, next
   interventionRows.then(interventions => {
     req.params.docs = interventions;
     next();
-  }, (err) => next(err));
+  }, (err) => {
+    logger.error("Intervention:", err);
+    next(err);
+  });
 }
 
 /**

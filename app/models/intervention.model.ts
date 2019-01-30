@@ -61,7 +61,6 @@ InterventionSchema.statics = {
     let q = this.findOne({
       key: key
     });
-
     return q.exec()
       .then((intervention: IInterventionModel) => {
         if (intervention) {
