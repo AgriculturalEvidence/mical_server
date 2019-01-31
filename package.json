@@ -9,13 +9,14 @@
   },
   "dependencies": {
     "@types/chai": "^3.5.2",
+    "@types/geojson": "^7946.0.5",
     "@types/mocha": "^5.2.0",
     "@types/mongoose": "^4.7.2",
     "@types/restify": "^2.0.36",
     "@types/sinon": "^1.16.34",
     "@types/supertest": "^2.0.0",
     "@types/xlsx": "0.0.36",
-    "@types/geojson": "^7946.0.5",
+    "bunyan-debug-stream": "^2.0.0",
     "geojson": "^0.5.0",
     "mongoose": "^4.7.5",
     "restify": "^4.1.1",
@@ -38,6 +39,6 @@
     "test": "npm run build && NODE_ENV='test' node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha test/**/*.spec.js",
     "cover": "npm run test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "start": "npm run build && node server.js | bunyan -o short",
-    "parse": "npm run build && node parse.js"
+    "parse": "npm run build && NODE_ENV='parse' node parse.js"
   }
 }

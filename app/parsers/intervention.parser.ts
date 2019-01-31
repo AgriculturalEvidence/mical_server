@@ -60,28 +60,31 @@ class InterventionParser extends Parser {
         if(!validRow(row)) {
           logger.info("Dropping row " + row);
         } else {
-          logger.info(row);
           rows.push(new Intervention(row));
         }
     }
     return rows;
   }
 
-  async run(): Promise<boolean> {
-    let wb: WorkBook = XLSX.readFile(this.interventionJob.fileName);
-    let [found, ws, cols] = this.findColumns(wb, this.interventionJob.columnMapping);
-    if (!found) {
-      console.log("Couldn't find all cols, aborting!");
-      return false;
+  async run(): Promise<number> {
+    try {
+      let wb: WorkBook = XLSX.readFile(this.interventionJob.fileName);
+      let [found, ws, cols] = this.findColumns(wb, this.interventionJob.columnMapping);
+      if (!found) {
+        logger.error("Couldn't find all cols, aborting!");
+        return 0;
+      }
+      let rows = this.prepareRows(ws, cols);
+      return Promise.all(rows.map(function (r) {
+        return r.save();
+      })).then((rows) => rows.length).catch(e => {
+        console.log("error!");
+        return 0;
+      });
+    } catch (e) {
+      logger.error(JSON.stringify(e));
+      return Promise.reject("Error handling file");
     }
-    let rows = this.prepareRows(ws, cols);
-    return Promise.all(rows.map(function(r) {
-      console.log("asda");
-      return r.save();
-    })).then(() => true).catch(e => {
-      console.log("error!");
-      return false;
-    });
   }
 }
 

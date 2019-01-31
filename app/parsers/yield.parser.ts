@@ -1,6 +1,5 @@
 import { IStudyDocument, Study } from '../models/studies.model';
 import { IYieldDocument, Yield } from '../models/yield.model';
-import { app, db } from '../../server';
 import {GeoPoint} from '../models/geopoint.model';
 import {Parser, ParseJob, ColumDesc} from './paper.parser'
 import {ExcelDataType, WorkBook, WorkSheet} from 'xlsx';
@@ -67,7 +66,7 @@ class YieldParser extends Parser {
           interventionType: interventionRow.key
         };
       }).catch((err) => {
-        console.log("Cannot find intervention type for row, ", err);
+        logger.error("Cannot find intervention type for row, ", err);
         return null;
       }).then((row) => {
         if(validRow(row)) return {success:true, r: row};
@@ -81,17 +80,21 @@ class YieldParser extends Parser {
     return rows;
   }
 
-  async run(): Promise<boolean> {
-    let wb: WorkBook = XLSX.readFile(this.yieldJob.fileName);
-    let [found, ws, cols] = this.findColumns(wb, this.yieldJob.columnMapping);
-    if (!found) {
-      console.log("Couldn't find all cols, aborting!");
-      return false;
+  async run(): Promise<number> {
+    try {
+      let wb: WorkBook = XLSX.readFile(this.yieldJob.fileName);
+      let [found, ws, cols] = this.findColumns(wb, this.yieldJob.columnMapping);
+      if (!found) {
+        logger.error("Couldn't find all cols, aborting!");
+        return 0;
+      }
+      let rows = this.prepareRows(ws, cols);
+      return rows.then(rs =>
+        Promise.all(rs.map(r => new Yield(r).save()))
+      ).then((rows) => rows.length)
+    } catch (e) {
+      return Promise.reject("Error handling file: " + JSON.stringify(e));
     }
-    let rows = this.prepareRows(ws, cols);
-    return rows.then(rs => 
-      Promise.all(rs.map(r => new Yield(r).save()))
-    ).then(() => true)
   }
 }
 

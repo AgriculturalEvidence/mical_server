@@ -1,17 +1,16 @@
-import * as supertest from 'supertest';
 import 'mocha';
-import { expect } from 'chai';
+import {expect} from 'chai';
 import * as mongoose from 'mongoose';
-import { app, db } from '../../server';
-import { logger } from '../../utils/logger';
-import { EffectSizeScale, Study } from '../../app/models/studies.model';
-import { YieldParser } from '../../app/parsers/yield.parser';
-import { equal } from 'assert';
-import { WorkBook } from 'xlsx/types';
-import { Yield } from '../../app/models/yield.model';
-import { Intervention } from '../../app/models/intervention.model';
-import {parsingConfig} from '../../config/env';
-import {InterventionParser} from '../../app/parsers/intervention.parser';
+import {app} from '../../server';
+import {logger} from '../../utils/logger';
+import {Study} from '../../app/models/studies.model';
+import {YieldParser} from '../../app/parsers/yield.parser';
+import {equal} from 'assert';
+import {WorkBook} from 'xlsx/types';
+import {Yield} from '../../app/models/yield.model';
+import {Intervention} from '../../app/models/intervention.model';
+import * as serverBoot from '../../server';
+
 const XLSX = require('xlsx');
 
 let parseOpts = {
@@ -57,6 +56,8 @@ describe("yield parsing integration test", function() {
   this.timeout(10000);
 
   before(async () => {
+    // line needed to boot up server
+    serverBoot.app.address();
     await Intervention.remove({}, () => {
       logger.trace('Test db: intervention collection removed!');
     });

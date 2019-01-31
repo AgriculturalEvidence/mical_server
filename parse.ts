@@ -5,6 +5,8 @@ import {parsingConfig} from './config/env';
 import {YieldType} from './app/models/yield.model';
 import { Parser } from './app/parsers/paper.parser';
 import {InterventionParser} from './app/parsers/intervention.parser';
+import * as serverBoot from './server';
+import {logger} from './utils/logger';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -52,9 +54,6 @@ async function parseYield(): Promise<Parser> {
     studyDef: study,
     ... defaultSettings
   };
-  console.log("Default parameters are:");
-  console.log(JSON.stringify(parseYieldParams, <any> "", "\t"));
-  console.log("To modify option type in its name otherwise just press enter or r, \n to quit press q and to print options p.");
 
   parseYieldParams = await modifyParams(parseYieldParams);
 
@@ -63,8 +62,12 @@ async function parseYield(): Promise<Parser> {
 }
 
 async function modifyParams(params: any) {
+  console.log("Default parameters are:");
+  console.log(JSON.stringify(params, <any> "", "\t"));
+  console.log("To modify option, type in its name. Otherwise, " +
+    "press enter or r, \n to quit press q and to print options p.");
   while (true) {
-    let ans = await ask("What would you like to do? ");
+    let ans = await ask("Which parameter do you want to modify [fileName, ...]? ");
 
     let cleanAns = ans.trim();
     let posn = params;
@@ -85,12 +88,11 @@ async function modifyParams(params: any) {
       // start parsing at this point
       break;
     } else if (cleanAns == "q") {
-      return null;
+      return params;
     } else if (cleanAns == "p") {
       console.log(JSON.stringify(params, <any> "", "\t"));
     }
   }
-  return params
 }
 
 async function parseIntervention(): Promise<Parser> {
@@ -109,6 +111,7 @@ async function parseIntervention(): Promise<Parser> {
 async function run() {
   while (true) {
     // Ask what type of parser we would like to execute
+    console.log("Options are: \n yield \n intervention \n ...")
     let ans = await ask("What type of dataset? [yield, ...] ");
     let parser: Parser;
     switch (ans) {
@@ -116,16 +119,22 @@ async function run() {
         parser = await parseYield();
         break;
       case "intervention":
-        parser = await parseIntervention();
+        parser = await parseIntervention()
+        break;
       default:
-        console.log("couldn't parse answer ")
+        logger.error("couldn't parse answer ")
     }
 
     console.log("Running parsing operation");
-    parser.run();
+    await parser.run().then((insertedRows) => {
+      logger.info(insertedRows + " rows were inserted")
+    }).catch(err => logger.error(err));
 
   }
 }
 
-run();
+serverBoot.db.once('open', function () {
+  setTimeout(run, 100);
+});
+
 

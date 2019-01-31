@@ -20,6 +20,20 @@ if (config.env === 'dev' || config.env == 'development') {
   settings.streams.push({ level: 'info', stream: infoStream });
 }
 
+if (config.env === 'parse') {
+  let bunyanDebugStream = require('bunyan-debug-stream');
+  settings.streams = [{
+    level:  'info',
+    type:   'raw',
+    stream: bunyanDebugStream({
+      basepath: __dirname, // this should be the root folder of your project.
+      forceColor: true
+      })
+  }];
+
+  settings.serializers = bunyanDebugStream.serializers
+}
+
 if (config.debug) {
   settings.streams.push({ level: 'trace', stream: infoStream });
   settings.streams.push({ level: 'debug', path: 'debug.log' });

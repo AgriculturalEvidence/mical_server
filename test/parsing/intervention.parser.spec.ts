@@ -6,6 +6,7 @@ import {WorkBook} from 'xlsx/types';
 import {Intervention} from '../../app/models/intervention.model';
 import {parsingConfig} from '../../config/env';
 import {InterventionParser} from '../../app/parsers/intervention.parser';
+import * as serverBoot from "../../server"
 
 const XLSX = require('xlsx');
 
@@ -16,6 +17,8 @@ describe("Intervention", () => {
   };
 
   before(async () => {
+    // line needed to boot up server
+    serverBoot.app.address();
     await Intervention.remove({}, () => {
       logger.trace('Test db: intervention collection removed!');
     });
