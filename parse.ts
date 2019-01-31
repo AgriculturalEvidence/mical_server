@@ -4,6 +4,7 @@ import {EffectSizeScale, Study} from './app/models/studies.model';
 import {parsingConfig} from './config/env';
 import {YieldType} from './app/models/yield.model';
 import { Parser } from './app/parsers/paper.parser';
+import {InterventionParser} from './app/parsers/intervention.parser';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -21,7 +22,7 @@ async function askStudy(studyType: string) {
   let studyName = await ask("Study name: ");
   let effectScale = await ask("Effect Size Scale [L, D]: ");
 
-  var effectScaleEnum: EffectSizeScale = EffectSizeScale.LOG;
+  let effectScaleEnum: EffectSizeScale = EffectSizeScale.LOG;
   switch (effectScale) {
     case 'D': case 'd':
       console.log("Setting effect size to division scale");
@@ -55,15 +56,26 @@ async function parseYield(): Promise<Parser> {
   console.log(JSON.stringify(parseYieldParams, <any> "", "\t"));
   console.log("To modify option type in its name otherwise just press enter or r, \n to quit press q and to print options p.");
 
+  parseYieldParams = await modifyParams(parseYieldParams);
+
+  // Create parser and return it
+  return new YieldParser(parseYieldParams);
+}
+
+async function modifyParams(params: any) {
   while (true) {
     let ans = await ask("What would you like to do? ");
 
     let cleanAns = ans.trim();
-    let posn = parseYieldParams;
+    let posn = params;
     let list = cleanAns.split(".");
     let lastMember = list.pop();
-    list.forEach((v) => {
+    list.every((v) => {
+      if (posn[v]) {
         posn = posn[v];
+        return true;
+      }
+      return false;
     });
 
     if (posn[lastMember] !== undefined) {
@@ -75,12 +87,23 @@ async function parseYield(): Promise<Parser> {
     } else if (cleanAns == "q") {
       return null;
     } else if (cleanAns == "p") {
-      console.log(JSON.stringify(parseYieldParams, <any> "", "\t"));
+      console.log(JSON.stringify(params, <any> "", "\t"));
     }
   }
+  return params
+}
 
+async function parseIntervention(): Promise<Parser> {
+  let defaultSettings = parsingConfig.interventionParams;
+
+  let parseInterventionParams: any = {
+    ... defaultSettings
+  };
+
+  parseInterventionParams = await modifyParams(parseInterventionParams);
   // Create parser and return it
-  return new YieldParser(parseYieldParams);
+  return new InterventionParser(parseInterventionParams);
+
 }
 
 async function run() {
@@ -92,6 +115,8 @@ async function run() {
       case "yield":
         parser = await parseYield();
         break;
+      case "intervention":
+        parser = await parseIntervention();
       default:
         console.log("couldn't parse answer ")
     }

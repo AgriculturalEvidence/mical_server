@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import {ErrorCode, ErrorInfo} from '../util/errorcodes.info';
 
 const Schema = mongoose.Schema;
 
@@ -66,7 +67,10 @@ InterventionSchema.statics = {
         if (intervention) {
           return intervention;
         }
-        return Promise.reject('It seems like the intervention doesn\'t exist or there is no data');
+        return Promise.reject({
+          code: ErrorCode.INT_NOT_FOUND,
+          i: intervention,
+        });
       });
   },
 
@@ -80,7 +84,10 @@ InterventionSchema.statics = {
         if (intervention) {
           return intervention;
         }
-        return Promise.reject('It seems like the intervention doesn\'t exist or there is no data');
+        return Promise.reject({
+          code: ErrorCode.INT_NOT_FOUND,
+          i: intervention,
+        });
       });
   }
 };

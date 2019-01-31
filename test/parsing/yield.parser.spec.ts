@@ -1,15 +1,17 @@
 import * as supertest from 'supertest';
 import 'mocha';
 import { expect } from 'chai';
+import * as mongoose from 'mongoose';
 import { app, db } from '../../server';
 import { logger } from '../../utils/logger';
 import { EffectSizeScale, Study } from '../../app/models/studies.model';
-import * as mongoose from 'mongoose';
 import { YieldParser } from '../../app/parsers/yield.parser';
 import { equal } from 'assert';
 import { WorkBook } from 'xlsx/types';
 import { Yield } from '../../app/models/yield.model';
 import { Intervention } from '../../app/models/intervention.model';
+import {parsingConfig} from '../../config/env';
+import {InterventionParser} from '../../app/parsers/intervention.parser';
 const XLSX = require('xlsx');
 
 let parseOpts = {
@@ -51,24 +53,24 @@ let mockInterventions = [new Intervention({
 })];
 
 
-describe("yield parsing integration test", () => {
+describe("yield parsing integration test", function() {
+  this.timeout(10000);
 
-    before(async () => {
-        await Intervention.remove({}, () => {
-          logger.trace('Test db: intervention collection removed!');
-        });
+  before(async () => {
+    await Intervention.remove({}, () => {
+      logger.trace('Test db: intervention collection removed!');
+    });
 
-        await Yield.remove({}, () => {
-            logger.trace('Test db: yield collection removed!');
-        });
-        mockInterventions.forEach(i => i.save());
-      });
-
+    await Yield.remove({}, () => {
+      logger.trace('Test db: yield collection removed!');
+    });
+    mockInterventions.forEach(i => i.save());
+  });
     describe("find the right columns", () => {
         it ("finds for TND", () => {
             let yp = new YieldParser(parseOpts);
             let wb = XLSX.readFile(parseOpts.fileName);
-            
+
             let [f, _, cols] = yp.findColumns(wb, parseOpts.columnMapping);
             equal(f, true, "should find all columns");
 
@@ -100,10 +102,10 @@ describe("yield parsing integration test", () => {
         let yp = new YieldParser(parseOpts);
         function validation() {
             Yield.findByStudy(parseOpts.studyDef.id + "_1").then((values) => {
-                console.log(values.length);
+                expect(values.length).to.be.eq(8);
                 return Yield.getAllInterventionTypes()
             }, (err) => done(err)).then((types) => {
-                expect(types).to.deep.eq([1])
+                expect(types).to.deep.eq([1]);
                 done();
             }, (err) => done(err));
         }

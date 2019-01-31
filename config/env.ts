@@ -60,9 +60,21 @@ const defaultYieldParsingParams = {
     interventionType: "intType"
   }
 };
+const defaultInterventionParsingParams = {
+  fileName: "intervention.xlsx",
+  columnMapping: {
+    key: "key",
+    sKey: "sKey",
+    title: "title",
+    desc: "desc",
+    denom: "denom",
+    numerator: "numerator"
+  }
+};
 
 const parsingConfig = {
-  yieldParams: defaultYieldParsingParams
+  yieldParams: defaultYieldParsingParams,
+  interventionParams: defaultInterventionParsingParams
 };
 
 export { config, parsingConfig };

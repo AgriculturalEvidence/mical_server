@@ -77,7 +77,7 @@ describe('intervention API', () => {
             done(err);
           } else {
             expect(res.body.username).to.be.undefined;
-            expect(res.status).to.equal(500);
+            expect(res.status).to.equal(404);
             done();
           }
         });
@@ -109,7 +109,7 @@ describe('intervention API', () => {
             done(err);
           } else {
             expect(res.body.username).to.be.undefined;
-            expect(res.status).to.equal(500);
+            expect(res.status).to.equal(404);
             done();
           }
         });

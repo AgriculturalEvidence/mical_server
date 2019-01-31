@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import { GeoPoint } from './geopoint.model';
 import {IOutcomeTableDocument, IOutcomeTableModel} from './table.model';
+import {ErrorCode} from '../util/errorcodes.info';
 
 const Schema = mongoose.Schema;
 
@@ -76,7 +77,10 @@ YieldSchema.statics = {
         if (dataPoints && dataPoints.length) {
           return dataPoints;
         }
-        return Promise.reject('It seems like the study doesn\'t exist or there is no data');
+        return Promise.reject({
+          code: ErrorCode.YIELD_NO_DATA_FOR_STUDY,
+          studyId: studyId,
+        });
       });
   },
 
@@ -88,7 +92,10 @@ YieldSchema.statics = {
         if (dataPoints && dataPoints.length) {
           return dataPoints;
         }
-        return Promise.reject('It seems like the study doesn\'t contain data fo that intervention');
+        return Promise.reject({
+          code: ErrorCode.YIELD_NO_INTERVENTION_OF_TYPE,
+          key: interventionKey,
+        });
       });
   },
 
@@ -100,7 +107,9 @@ YieldSchema.statics = {
         if (dataPoints && dataPoints.length) {
           return dataPoints;
         }
-        return Promise.reject('It seems like the study doesn\'t contain data');
+        return Promise.reject({
+          code: ErrorCode.YIELD_NO_INTERVENTION_TYPES,
+        });
       });
   },
 };

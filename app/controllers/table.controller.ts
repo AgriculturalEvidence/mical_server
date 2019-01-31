@@ -4,6 +4,7 @@ import {logger} from '../../utils/logger';
 import {Yield} from '../models/yield.model';
 import * as mongoose from 'mongoose';
 import {IOutcomeTableDocument, IOutcomeTableModel} from '../models/table.model';
+import {format} from '../util/errorcodes.info';
 
 
 // TODO: vpineda, do this dynamically knowing which type are available
@@ -17,7 +18,7 @@ function load(req: restify.Request, res: restify.Response, next: restify.Next) {
 
 const TableMap: {[key: string]: IOutcomeTableModel<IOutcomeTableDocument>} = {
   yield: Yield
-}
+};
 
 /**
  * Gets all of the interventions in a given outcome table
@@ -41,7 +42,7 @@ function getTableInterventions(req: restify.Request, res: restify.Response, next
     next();
   }, (err) => {
     logger.error("Intervention:", err);
-    next(err);
+    res.json(format(err).status, format(err).msg);
   });
 }
 
@@ -52,6 +53,7 @@ function getTableInterventions(req: restify.Request, res: restify.Response, next
 function get(req: restify.Request, res: restify.Response, next: restify.Next) {
   logger.info("Answering response with ", req.params.docs.length, " rows.")
   res.json(200, req.params.docs);
+  next();
 }
 
 export { get, load, getTableInterventions };

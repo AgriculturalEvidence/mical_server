@@ -2,6 +2,7 @@ import * as restify from 'restify';
 import { IInterventionDocument, Intervention } from '../models/intervention.model';
 import { GeoPoint } from '../models/geopoint.model';
 import {logger} from '../../utils/logger';
+import {format} from '../util/errorcodes.info';
 
 /**
  * Search for a Intervention by id, and append it to req.params if successful.
@@ -13,7 +14,7 @@ function load(req: restify.Request, res: restify.Response, next: restify.Next) {
     return next();
   }).catch((err) => {
     logger.error(err);
-    next(err);
+    res.json(format(err).status, format(err).msg);
   });
 }
 
@@ -27,7 +28,7 @@ function loadAll(req: restify.Request, res: restify.Response, next: restify.Next
     return next();
   }).catch((err) => {
     logger.error(err);
-    next(err);
+    res.json(format(err).status, format(err).msg);
   });
 }
 
@@ -38,6 +39,7 @@ function loadAll(req: restify.Request, res: restify.Response, next: restify.Next
 function get(req: restify.Request, res: restify.Response, next: restify.Next) {
   logger.info("Answering response with ", req.params.docs.length, " rows.")
   res.json(200, req.params.docs);
+  next();
 }
 
 /**

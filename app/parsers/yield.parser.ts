@@ -29,7 +29,7 @@ function validRow(newData: any) {
   }
   if (!newData.coords.coordinates.every(
     (v: any) => typeof v == 'number')) {
-    console.log("Dropping: " + JSON.stringify(newData));
+    logger.info("Dropping: " + JSON.stringify(newData));
     return false;
   }
   if (typeof newData.effectSize !== 'number') {
@@ -77,7 +77,7 @@ class YieldParser extends Parser {
     }
     let rows = Promise.all(rowPromises).then((rows) => {
       return rows.filter(v => v.success).map(v => v.r);
-    })
+    });
     return rows;
   }
 

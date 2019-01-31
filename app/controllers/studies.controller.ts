@@ -1,6 +1,7 @@
 import * as restify from 'restify';
 import { IStudyDocument, Study } from '../models/studies.model';
 import { GeoPoint } from '../models/geopoint.model';
+import {format} from '../util/errorcodes.info';
 
 /**
  * Search for studies of a given type
@@ -11,7 +12,7 @@ function load(req: restify.Request, res: restify.Response, next: restify.Next) {
     req.params.studies = studies;
     return next();
   }).catch((err) => {
-    next(err);
+    res.json(format(err).status, format(err).msg);
   });
 }
 
@@ -50,7 +51,7 @@ function create(req: restify.Request, res: restify.Response, next: restify.Next)
       res.json(200, savedEntry);
       return next();
     })
-    .catch((err: any) => next(err));
+    .catch((err: any) => res.json(format(err).status, format(err).msg));
 }
 
 
@@ -68,7 +69,7 @@ function remove(req: restify.Request, res: restify.Response, next: restify.Next)
     res.json(200, results.length);
     next();
   }).catch((r) => {
-    next(r);
+    res.json(format(r).status, format(r).msg);
   });
 }
 
