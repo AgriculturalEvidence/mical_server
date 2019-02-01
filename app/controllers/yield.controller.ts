@@ -18,6 +18,10 @@ function load(req: restify.Request, res: restify.Response, next: restify.Next) {
   });
 }
 
+/**
+ * Gets array of points as [lng, lat]
+ * @param req.params.area array orgianized by lat and then long, must come in pairs!
+ */
 function getPolygon(req: restify.Request): number[][] {
   const area: string = req.params.area;
   if (!area) {
@@ -29,7 +33,8 @@ function getPolygon(req: restify.Request): number[][] {
   }
   let corners: number[][] = [];
   for (let i = 0; i < points.length; i += 2) {
-    corners.push([points[i], points[i + 1]]);
+    // swap the order 
+    corners.push([points[i + 1], points[i]]);
   }
   corners.push(corners[0]);
   return corners;
