@@ -38,9 +38,9 @@ const config: ConfigSettings = {
 
 // settings for test environment
 // *IMPORTANT* do not set test db to production db, as the tests will overwrite it.
-if (env === 'test') {
-  config.db = 'mongodb://root:example@localhost:27017/test';
-}
+// if (env === 'test') {
+//   config.db = 'mongodb://root:example@localhost:27017/test';
+// }
 
 // settings for test environment
 if (env === 'production') {

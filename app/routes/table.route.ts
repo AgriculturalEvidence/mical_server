@@ -3,8 +3,12 @@ import * as controller from '../controllers/table.controller';
 
 export default (api: restify.Server) => {
 
-  /** GET /api/table/:studyId - Get rows of the given studyId */
+  /** GET /api/table/ gets all tables */
   api.get('/api/table/', controller.load, controller.get);
-  api.get('/api/table/intervention/:table', controller.getTableInterventions, controller.get);
 
+  /** GET the data on a table, pass in filters through query params */
+  api.get('/api/table/:table', controller.load, controller.query, controller.get);
+
+  /** GET the inteventions of a given table */
+  api.get('/api/table/intervention/:table', controller.getTableInterventions, controller.get);
 };
