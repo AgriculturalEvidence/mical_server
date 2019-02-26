@@ -2,16 +2,11 @@ import * as restify from 'restify';
 import { logger } from '../../utils/logger';
 
 
-function load(req: restify.Request, res: restify.Response, next: restify.Next) {
-  logger.info('get histogram');
-  res.json(200, 'get histogram');
+function build(req: restify.Request, res: restify.Response, next: restify.Next) {
+  logger.info('build histogram');
+  res.json(200, 'build histogram');
   return next();
 }
 
-function get(req: restify.Request, res: restify.Response, next: restify.Next) {
-  logger.info('get histogram');
-  res.json(200, 'get histogram');
-  return next();
-}
 
-export { load, get }
+export { build }

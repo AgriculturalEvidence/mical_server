@@ -138,10 +138,10 @@ describe("yield parsing integration test", function() {
 
       let yp = new YieldParser(parseOpts);
       function validation() {
-        Yield.findByStudy("").then((values) => {
+        Yield.findByStudy("12_1").then((values) => {
           console.log(values.length);
           done();
-        })
+        }, (err) => done(err));
       }
       yp.run().then(validation, (err) => done("Coudn't add rows! " + err))
     });
