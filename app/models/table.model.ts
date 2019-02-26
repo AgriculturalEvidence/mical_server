@@ -54,6 +54,14 @@ export function getQueryCols(str: string): string[] {
   return [];
 }
 
+/**
+ * Queries the given table within coords and with a given set of filters. If you
+ * need special columns you can specify them inside of the cols param
+ * @param tableStr table name
+ * @param coords the enclosing polygon oriented ccw
+ * @param filters the filters that will be applied to the given query
+ * @param cols extra cols that might be needed
+ */
 export async function query(tableStr: string, coords: number[][], 
   filters?: Object, cols?: string[]): Promise<Array<IOutcomeTableDocument>> {
 

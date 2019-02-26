@@ -13,6 +13,12 @@ function load(req: restify.Request, res: restify.Response, next: restify.Next) {
   return next();
 }
 
+/**
+ * Performs a query on a given table
+ * @param req.param.table the query table
+ * @param req.param.area the ccw-oriented geolocation point filter
+ * @param req.param.f extra filters that frontend might want
+ */
 function query(req: restify.Request, res: restify.Response, next: restify.Next) {
   Table.query(req.params.table, getCoordsPolygon(req.params.area), getQueryFilters(req.params.f))
     .then((data) => {
@@ -24,12 +30,9 @@ function query(req: restify.Request, res: restify.Response, next: restify.Next) 
     })
 }
 
-
 /**
  * Gets all of the interventions in a given outcome table
- * @param req
- * @param res
- * @param next
+ * @param req.params.table the table that we want all intervention types
  */
 
 function getTableInterventions(req: restify.Request, res: restify.Response, next: restify.Next) {

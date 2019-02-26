@@ -2,6 +2,9 @@ export enum ErrorCode {
   TABLE_NOT_FOUND,
   INT_NOT_FOUND,
 
+  INVALID_NUMBER_OF_TICKS,
+  INVALID_NUMBER_OF_SAMPLE_PTS,
+
   YIELD_NO_INTERVENTION_TYPES,
   YIELD_NO_INTERVENTION_OF_TYPE,
   YIELD_NO_DATA_FOR_STUDY
@@ -38,6 +41,16 @@ export function format(error: ErrorInfo): {status: number, msg: string} {
       return {
         status: 404,
         msg: "Table " + err.table + " not found!",
+      }
+    case ErrorCode.INVALID_NUMBER_OF_SAMPLE_PTS:
+      return {
+        status: 400,
+        msg: "Invalid number of sample points"
+      }
+    case ErrorCode.INVALID_NUMBER_OF_TICKS:
+      return {
+        status: 400, 
+        msg: "Invalid number of ticks"
       }
   }
   return {
