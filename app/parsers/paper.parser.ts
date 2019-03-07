@@ -1,5 +1,5 @@
 import { WorkBook, WorkSheet} from 'xlsx';
-import { indexToColumn } from '../util/excel.helpers';
+import { indexToColumn } from '../util/excel.helpers.util';
 const XLSX = require('xlsx');
 
 interface ParseJob {

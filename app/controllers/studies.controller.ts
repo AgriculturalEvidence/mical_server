@@ -1,6 +1,5 @@
 import * as restify from 'restify';
 import { IStudyDocument, Study } from '../models/studies.model';
-import { GeoPoint } from '../models/geopoint.model';
 import {format} from '../util/errorcodes.info';
 
 /**

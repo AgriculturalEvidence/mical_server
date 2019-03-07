@@ -2,7 +2,7 @@ import * as supertest from 'supertest';
 import 'mocha';
 import { expect } from 'chai';
 import { logger } from '../../utils/logger';
-import { columnToIndex, indexToColumn, parseRef } from '../../app/util/excel.helpers';
+import { columnToIndex, indexToColumn, parseRef } from '../../app/util/excel.helpers.util';
 
 describe("Excel helper tests", function() {
     describe("can succesfully convert to letters", function() {

@@ -2,6 +2,7 @@ import * as mongoose from 'mongoose';
 import { Yield } from './yield.model';
 import {logger} from '../../utils/logger';
 import { ErrorCode } from '../util/errorcodes.info';
+let atob = require('atob');
 
 export interface IOutcomeTableDocument extends mongoose.Document {
   interventionType: string;
@@ -45,9 +46,18 @@ export function getCoordsPolygon(str: string): number[][] {
  * Parses the filters from the request and applies them to the given query
  * @param str the encoded str with all of the filters
  */
-export function getQueryFilters(str: string): Object {
+export function getQueryFilters(str: string, intTpe: string): Object {
   // todo vpineda
-  return {};
+  let ans : any = {};
+  if (str !== undefined && str !== "" && str !== null) {
+    let decodedStr = atob(str);
+    ans = {...ans, ...JSON.parse(decodedStr)}
+  }
+  let interventionKey = parseInt(intTpe);
+  if (!isNaN(interventionKey)) {
+    ans['intervention'] = interventionKey;
+  }
+  return ans;
 }
 
 export function getQueryCols(str: string): string[] {
@@ -74,3 +84,6 @@ export async function query(tableStr: string, coords: number[][],
   return table.findByCoords(coords, filters);
 }
 
+export function getTables() {
+  return Object.keys(TableMap);
+}

@@ -1,6 +1,6 @@
 import {ColumDesc, ParseJob, Parser} from './paper.parser';
 import {WorkBook, WorkSheet} from 'xlsx';
-import {parseRef} from '../util/excel.helpers';
+import {parseRef} from '../util/excel.helpers.util';
 import {IInterventionDocument, Intervention} from '../models/intervention.model';
 import {logger} from '../../utils/logger';
 

@@ -1,6 +1,5 @@
 import * as restify from 'restify';
 import { IInterventionDocument, Intervention } from '../models/intervention.model';
-import { GeoPoint } from '../models/geopoint.model';
 import {logger} from '../../utils/logger';
 import {format} from '../util/errorcodes.info';
 

@@ -10,6 +10,7 @@ import * as Table from '../models/table.model'
  * Search get all tables
  */
 function load(req: restify.Request, res: restify.Response, next: restify.Next) {
+  req.params.docs = Table.getTables();
   return next();
 }
 
@@ -20,7 +21,7 @@ function load(req: restify.Request, res: restify.Response, next: restify.Next) {
  * @param req.param.f extra filters that frontend might want
  */
 function query(req: restify.Request, res: restify.Response, next: restify.Next) {
-  Table.query(req.params.table, getCoordsPolygon(req.params.area), getQueryFilters(req.params.f))
+  Table.query(req.params.table, getCoordsPolygon(req.params.area), getQueryFilters(req.params.f, req.params.int))
     .then((data) => {
       req.params.docs = data;
       next();

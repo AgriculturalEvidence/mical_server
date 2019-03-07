@@ -1,11 +1,11 @@
-import { IStudyDocument, Study } from '../models/studies.model';
-import { IYieldDocument, Yield } from '../models/yield.model';
-import {GeoPoint} from '../models/geopoint.model';
-import {Parser, ParseJob, ColumDesc} from './paper.parser'
-import {ExcelDataType, WorkBook, WorkSheet} from 'xlsx';
-import { parseRef } from '../util/excel.helpers';
-import { Intervention } from '../models/intervention.model';
-import { logger } from '../../utils/logger';
+import {IStudyDocument} from '../models/studies.model';
+import {IYieldDocument, Yield} from '../models/yield.model';
+import {ColumDesc, ParseJob, Parser} from './paper.parser';
+import {WorkBook, WorkSheet} from 'xlsx';
+import {parseRef} from '../util/excel.helpers.util';
+import {Intervention} from '../models/intervention.model';
+import {logger} from '../../utils/logger';
+
 const XLSX = require('xlsx');
 
 interface YieldJob extends ParseJob {
@@ -74,10 +74,9 @@ class YieldParser extends Parser {
       });
       rowPromises.push(newRowPromise);
     }
-    let rows = Promise.all(rowPromises).then((rows) => {
+    return Promise.all(rowPromises).then((rows) => {
       return rows.filter(v => v.success).map(v => v.r);
     });
-    return rows;
   }
 
   async run(): Promise<number> {

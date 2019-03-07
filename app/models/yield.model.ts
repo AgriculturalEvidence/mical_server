@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
-import { GeoPoint } from './geopoint.model';
 import {IOutcomeTableDocument, IOutcomeTableModel} from './table.model';
 import {ErrorCode} from '../util/errorcodes.info';
+import {GeoPoint} from '../util/typedef.util';
 
 const Schema = mongoose.Schema;
 
@@ -59,6 +59,7 @@ YieldSchema.statics = {
   * Get
   * @param {string} studyId - The studyId that we are trying to query.
   * @param {[]number} areaPoints a set of points greater than 3 that represents an area on the map
+  * @param {Object} filters? additional filters that we might want to include
   * @returns {Promise<Array<IYieldDocument>>} Returns a Promise of the datapoints.
   */
   // todo vpineda figure out which type of queries we want to compute
@@ -98,7 +99,9 @@ YieldSchema.statics = {
   },
 
   findByInterventionType(interventionKey: number): Promise<IYieldDocument[]> {
-    let q = this.find(interventionKey);
+    let q = this.find({
+      interventionType: interventionKey,
+    });
 
     return q.exec()
       .then((dataPoints: Array<IYieldDocument>) => {
