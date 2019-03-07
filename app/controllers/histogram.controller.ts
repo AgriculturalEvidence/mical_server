@@ -63,28 +63,32 @@ async function group(rows: IOutcomeTableDocument[], ticks: number): Promise<[num
     min = Math.min(min, efS);
   });
 
+  if (max === min) max += 1;
+
   // create ticks
   let aTicks: number[] = [];
   for (let i = 0; i < ticks; i++) {
-    aTicks.push(min + (max/(ticks - 1))*i)
+    aTicks.push(min + ((max - min)/(ticks - 1))*i)
   }
 
   // create aggregate count
-  let buckets = Array(aTicks.length).fill(0);
+  let buckets = Array(aTicks.length).fill(0.0);
   let sum = 0;
   rows.forEach(r => {
     let efs = r.get("effectSize", Number);
     let saSize = r.get("sampleSize", Number);
     // get idx of the tick that we want to jump to
-    let tick = Math.floor((efs - min) * (ticks - 1) / max);
+    let tick = Math.floor((efs - min) * (ticks - 1) / (max- min));
     buckets[tick] +=  saSize;
     sum += saSize;
   });
 
+  if (sum === 0) sum = 1;
+
   let getloc = (idx: number) => {
     if (idx == 0) return min;
     if (idx == buckets.length - 1) return max;
-    return (aTicks[idx + 1] - aTicks[idx - 1]) / 2 ;
+    return aTicks[idx - 1] + ((aTicks[idx] - aTicks[idx - 1]) / 2) ;
   };
   // normalize
   let nBuckets = buckets.map((v, idx) => <[number, number]>[getloc(idx) , v/sum]);
@@ -115,7 +119,19 @@ async function sampleDistribution(aTicks: number[], buckets : number[], samplePt
       pts[i*samplePts + j] = start + j*step;
     }
   }
-  return kde(pts);
+
+  // @look at Scott, D. W. (1992) Multivariate Density Estimation: Theory, Practice, and
+  // Visualization. Wiley.
+  let dist1 =  kde.bandwidth(science.stats.bandwidth.nrd)(pts);
+
+  if (dist1[0] !== undefined && !isNaN(dist1[0][1])) {
+    return dist1;
+  }
+
+  // sometimes that distribution doesnt work, if the third and first quartiles are the same
+  // if we fail try the fallback, not as good but should do the trick
+  // @lookat  Silverman, B. W. (1986) Density Estimation. London: Chapman and Hall.
+  return kde.bandwidth(science.stats.bandwidth.nrd0)(pts);
 }
 
 /**

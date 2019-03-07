@@ -24,11 +24,6 @@ describe('study API', () => {
     });
   });
 
-  after(function (done) {
-    app.close();
-    done();
-  });
-
   describe('POST /api/studies', () => {
     it('should successfully create a new study entry', (done) => {
       supertest(app)

@@ -76,8 +76,21 @@ describe('intervention API', () => {
           if (err) {
             done(err);
           } else {
-            expect(res.body.username).to.be.undefined;
             expect(res.status).to.equal(404);
+            done();
+          }
+        });
+    });
+
+    it('should get all of the interventions', (done) => {
+      supertest(app)
+        .get('/api/intervention')
+        .end((err: any, res: supertest.Response) => {
+          if (err) {
+            done(err);
+          } else {
+            expect(res.body.length).to.equal(1);
+            expect(res.status).to.equal(200);
             done();
           }
         });

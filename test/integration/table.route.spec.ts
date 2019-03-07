@@ -5,7 +5,8 @@ import { app, db } from '../../server';
 import { logger } from '../../utils/logger';
 import {IYieldDocument, Yield} from '../../app/models/yield.model';
 import * as mongoose from "mongoose";
-import {GeoPoint} from '../../app/util/typedef.util';
+import {GeoPoint, Series} from '../../app/util/typedef.util';
+import {Intervention} from '../../app/models/intervention.model';
 const btoa = require('btoa');
 
 const yieldEntry = {
@@ -14,6 +15,15 @@ const yieldEntry = {
   sampleSize: 20,
   studyID: '11ADAFF',
   interventionType: 1,
+};
+
+const interventionEntry = {
+  key: 1,
+  sKey: "organic",
+  title: "Orgainc Effect Size",
+  desc: "How much does orgainc increase intervention",
+  denom: "Lower interventions",
+  numerator: "Higher interventions",
 };
 
 const mockGeoPt: any = {
@@ -44,12 +54,18 @@ describe('table API (with yield API)', () => {
     await Yield.remove({}, () => {
       logger.trace('Test db: Yield collection removed!');
     });
+
+    await Intervention.remove({}, () => {
+      logger.trace('Test db: Intervention collection removed!');
+    });
     // add data
     let data: IYieldDocument[] = [];
     for (let i = 0; i < numberOfEntries; i++) {
       let yieldEnt = { ...yieldEntry, coords: geoPoints[i] };
       await new Yield(yieldEnt).save();
     }
+
+    await new Intervention(interventionEntry).save();
   });
 
   describe('GET /api/table', () => {
@@ -115,6 +131,147 @@ describe('table API (with yield API)', () => {
           }
         });
     });
+  });
+
+  describe('GET /api/table/intervention/yield', () => {
+    it('should get valid intervention types in table', (done) => {
+      supertest(app)
+        .get('/api/table/intervention/yield')
+        .end((err: any, res: supertest.Response) => {
+          if (err) {
+            done(err);
+          } else {
+            expect(res.body[0].key).to.equal(interventionEntry.key);
+            expect(res.body[0].sKey).to.equal(interventionEntry.sKey);
+            expect(res.body[0].title).to.equal(interventionEntry.title);
+            expect(res.body[0].desc).to.equal(interventionEntry.desc);
+            expect(res.body[0].denom).to.equal(interventionEntry.denom);
+            expect(res.body[0].numerator).to.equal(interventionEntry.numerator);
+            expect(res.status).to.equal(200);
+            done();
+          }
+        });
+    });
+
+    it('should return 404 if table doesnt exist', (done) => {
+      supertest(app)
+        .get('/api/table/intervention/mocktable')
+        .end((err: any, res: supertest.Response) => {
+          if (err) {
+            done(err);
+          } else {
+            expect(res.status).to.equal(404);
+            done();
+          }
+        });
+    });
+  });
+
+  describe("GET /api/table/histogram/yield", () => {
+    it("should return a valid histogram definition", (done) => {
+      supertest(app)
+        .get('/api/table/histogram/yield?ticks=10&samplePts=1')
+        .end((err: any, res: supertest.Response) => {
+          if (err) {
+            done(err);
+          } else {
+            let series: Series = res.body;
+            expect(series.bar).to.deep.equal([
+              [ 3, 1 ],
+              [ 3.0555555555555554, 0 ],
+              [ 3.166666666666667, 0 ],
+              [ 3.2777777777777777, 0 ],
+              [ 3.3888888888888893, 0 ],
+              [ 3.5, 0 ],
+              [ 3.6111111111111107, 0 ],
+              [ 3.7222222222222223, 0 ],
+              [ 3.833333333333333, 0 ],
+              [ 4, 0 ] ]
+            );
+            expect(isNaN(series.dist[0][0])).to.be.false;
+            expect
+            expect(res.status).to.equal(200);
+            done();
+          }
+        });
+    });
+
+    describe("should work on uniform distribution", () => {
+      before(async () => {
+        await Yield.remove({}, () => {
+          logger.trace('Test db: Yield collection removed!');
+        });
+        // add data
+        let data: IYieldDocument[] = [];
+        for (let i = 0; i < numberOfEntries; i++) {
+          let yieldEnt = { ...yieldEntry, effectSize: (i - 5)/ 10, coords: geoPoints[i] };
+          await new Yield(yieldEnt).save();
+        }
+
+      });
+
+      it("should return a valid histogram definition", (done) => {
+        supertest(app)
+          .get('/api/table/histogram/yield?ticks=10&samplePts=1')
+          .end((err: any, res: supertest.Response) => {
+            if (err) {
+              done(err);
+            } else {
+              let series: Series = res.body;
+              expect(series.bar).to.deep.equal([
+                [ -0.5, 0.16666666666666666 ],
+                [ -0.4388888888888889, 0.08333333333333333 ],
+                [ -0.31666666666666665, 0.08333333333333333 ],
+                [ -0.19444444444444442, 0.08333333333333333 ],
+                [ -0.07222222222222219, 0.16666666666666666 ],
+                [ 0.050000000000000044, 0.08333333333333333 ],
+                [ 0.17222222222222228, 0.08333333333333333 ],
+                [ 0.2944444444444445, 0.08333333333333333 ],
+                [ 0.41666666666666674, 0.08333333333333333 ],
+                [ 0.6, 0.08333333333333333 ]
+              ]);
+              expect(isNaN(series.dist[0][0])).to.be.false;
+              expect
+              expect(res.status).to.equal(200);
+              done();
+            }
+          });
+      })
+    });
+
+    describe("should work on normal dist", () => {
+      before(async () => {
+        await Yield.remove({}, () => {
+          logger.trace('Test db: Yield collection removed!');
+        });
+        // add data
+        let data: IYieldDocument[] = [];
+        for (let i = 0; i < numberOfEntries; i++) {
+          let yieldEnt = { ...yieldEntry,
+            effectSize: (i - 5)/ 10,
+            sampleSize: Math.floor(Math.exp(i-5)),
+            coords: geoPoints[i] };
+          await new Yield(yieldEnt).save();
+        }
+
+      });
+
+      it("should return a valid histogram definition", (done) => {
+        supertest(app)
+          .get('/api/table/histogram/yield?ticks=10&samplePts=1')
+          .end((err: any, res: supertest.Response) => {
+            if (err) {
+              done(err);
+            } else {
+              let series: Series = res.body;
+              expect(isNaN(series.dist[0][0])).to.be.false;
+              expect
+              expect(res.status).to.equal(200);
+              done();
+            }
+          });
+      })
+    })
   });
 
 });

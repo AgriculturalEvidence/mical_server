@@ -10,7 +10,8 @@ import * as Table from '../models/table.model'
  * Search get all tables
  */
 function load(req: restify.Request, res: restify.Response, next: restify.Next) {
-  req.params.docs = Table.getTables();
+  req.params.tables = Table.getTables();
+  req.params.docs = Object.keys(Table.getTables());
   return next();
 }
 

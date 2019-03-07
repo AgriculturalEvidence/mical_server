@@ -85,5 +85,5 @@ export async function query(tableStr: string, coords: number[][],
 }
 
 export function getTables() {
-  return Object.keys(TableMap);
+  return TableMap;
 }
