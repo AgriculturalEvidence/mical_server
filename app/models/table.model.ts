@@ -55,13 +55,17 @@ export function getQueryFilters(str: string, intTpe: string): Object {
   }
   let interventionKey = parseInt(intTpe);
   if (!isNaN(interventionKey)) {
-    ans['intervention'] = interventionKey;
+    ans['interventionType'] = interventionKey;
   }
   return ans;
 }
 
-export function getQueryCols(str: string): string[] {
-  return [];
+export function getQueryCols(str: string): {[col: string]: number } {
+  if (str == undefined) return {_id: 0};
+  let col = str.split(",");
+  let obj: {[col: string]: number } = {_id: 0};
+  col.forEach(v => obj[v] = 1);
+  return obj;
 }
 
 /**
@@ -73,7 +77,7 @@ export function getQueryCols(str: string): string[] {
  * @param cols extra cols that might be needed
  */
 export async function query(tableStr: string, coords: number[][], 
-  filters?: Object, cols?: string[]): Promise<Array<IOutcomeTableDocument>> {
+  filters?: Object, cols?: {[col: string]: number}): Promise<Array<IOutcomeTableDocument>> {
 
   let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
   if (!table) {

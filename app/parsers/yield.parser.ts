@@ -51,20 +51,38 @@ class YieldParser extends Parser {
   prepareRows(ws: WorkSheet, colInfo: ColumDesc) : Promise<IYieldDocument[]> {
     let [_, numRows] = parseRef(ws["!ref"]);
     let rowPromises = [];
+    console.log(colInfo);
 
     for(let rowIdx = 2; rowIdx <= numRows; rowIdx ++) {
+      let m = ws[colInfo.interventionType + rowIdx];
+      if (!m) {
+        console.log("Cell: " + colInfo.interventionType + rowIdx + "is empty!");
+        continue;
+      }
       let newRowPromise = Intervention.findByStringKey(ws[colInfo.interventionType + rowIdx].v).then(interventionRow => {
-        return {
+        let x = ws[colInfo.xCoords + rowIdx];
+        let y = ws[colInfo.yCoords + rowIdx];
+        let effS = ws[colInfo.effectSize + rowIdx];
+        let samS = ws[colInfo.sampleSize + rowIdx];
+        let studID = ws[colInfo.studyId + rowIdx];
+
+        if (!x) logger.info("Dropping row due to x");
+        if (!y) logger.info("Dropping row due to y");
+        if (!effS) logger.info("Dropping row due to effs");
+        if (!samS) logger.info("Dropping row due to sams");
+        if (!studID) logger.info("Dropping row due to studyid");
+
+        let retv =  {
           coords: {
             type: 'Point',
-            coordinates: [ws[colInfo.xCoords + rowIdx].v, 
-            ws[colInfo.yCoords + rowIdx].v],
+            coordinates: [x.v, y.v],
           },
-          effectSize: ws[colInfo.effectSize + rowIdx].v,
-          sampleSize: ws[colInfo.sampleSize + rowIdx].v,
-          studyID: this.yieldJob.studyDef.id + "_" + ws[colInfo.studyId + rowIdx].v,
+          effectSize: effS.v,
+          sampleSize: samS.v,
+          studyID: this.yieldJob.studyDef.id + "_" + studID.v,
           interventionType: interventionRow.key
         };
+        return new Promise((d) => d(retv));
       }).catch((err) => {
         logger.error("Cannot find intervention type for row, ", err);
         return null;
@@ -92,6 +110,7 @@ class YieldParser extends Parser {
         Promise.all(rs.map(r => new Yield(r).save()))
       ).then((rows) => rows.length)
     } catch (e) {
+      console.log(e.stack);
       return Promise.reject("Error handling file: " + JSON.stringify(e));
     }
   }

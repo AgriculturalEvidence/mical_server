@@ -84,10 +84,8 @@ async function modifyParams(params: any) {
     if (posn[lastMember] !== undefined) {
       // modify config
       posn[lastMember] = await ask("Value: ");
-    } else if (cleanAns === "r" || cleanAns === "") {
+    } else if (cleanAns === "r" || cleanAns === "" || cleanAns == "q") {
       // start parsing at this point
-      break;
-    } else if (cleanAns == "q") {
       return params;
     } else if (cleanAns == "p") {
       console.log(JSON.stringify(params, <any> "", "\t"));
@@ -105,7 +103,6 @@ async function parseIntervention(): Promise<Parser> {
   parseInterventionParams = await modifyParams(parseInterventionParams);
   // Create parser and return it
   return new InterventionParser(parseInterventionParams);
-
 }
 
 async function run() {

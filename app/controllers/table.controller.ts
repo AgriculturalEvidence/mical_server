@@ -22,7 +22,10 @@ function load(req: restify.Request, res: restify.Response, next: restify.Next) {
  * @param req.param.f extra filters that frontend might want
  */
 function query(req: restify.Request, res: restify.Response, next: restify.Next) {
-  Table.query(req.params.table, getCoordsPolygon(req.params.area), getQueryFilters(req.params.f, req.params.int))
+  Table.query(req.params.table,
+    getCoordsPolygon(req.params.area),
+    getQueryFilters(req.params.f, req.params.int),
+    getQueryCols(req.params.cols))
     .then((data) => {
       req.params.docs = data;
       next();
