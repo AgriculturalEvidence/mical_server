@@ -20,6 +20,7 @@ function load(req: restify.Request, res: restify.Response, next: restify.Next) {
  * @param req.param.table the query table
  * @param req.param.area the ccw-oriented geolocation point filter
  * @param req.param.f extra filters that frontend might want
+ * @param req.param.cols columns that you want to query
  */
 function query(req: restify.Request, res: restify.Response, next: restify.Next) {
   Table.query(req.params.table,

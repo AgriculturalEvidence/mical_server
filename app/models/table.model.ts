@@ -2,14 +2,24 @@ import * as mongoose from 'mongoose';
 import { Yield } from './yield.model';
 import {logger} from '../../utils/logger';
 import { ErrorCode } from '../util/errorcodes.info';
+import { PerformanceObserver, performance } from 'perf_hooks';
 let atob = require('atob');
 
-export interface IOutcomeTableDocument extends mongoose.Document {
+// Row interface, values of each row without being a full-fledged document,
+// helpful when querying a lot of data
+export interface IOutcomeTableRow {
   interventionType: string;
+  effectSize: number;
+  sampleSize: number;
+}
+
+export interface IOutcomeTableDocument extends mongoose.Document, IOutcomeTableRow {
 }
 
 export interface IOutcomeTableModel<T> {
-  findByCoords(areaPoints: Array<number[]>, filters?: Object): Promise<Array<IOutcomeTableDocument>>
+  findByCoords(areaPoints: Array<number[]>,
+               filters?: Object,
+               cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>>
   findByInterventionType(interventionKey: number): Promise<T[]>;
   getAllInterventionTypes(): Promise<number[]>;
 }
@@ -77,7 +87,9 @@ export function getQueryCols(str: string): {[col: string]: number } {
  * @param cols extra cols that might be needed
  */
 export async function query(tableStr: string, coords: number[][], 
-  filters?: Object, cols?: {[col: string]: number}): Promise<Array<IOutcomeTableDocument>> {
+  filters?: Object, cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>> {
+
+  let startT = performance.now();
 
   let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
   if (!table) {
@@ -85,7 +97,10 @@ export async function query(tableStr: string, coords: number[][],
     return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
   }
   // todo vpineda add the query cols that we want to show
-  return table.findByCoords(coords, filters);
+  let ans = await table.findByCoords(coords, filters, cols);
+
+  logger.trace("Query took: " + (performance.now() - startT) + " millis");
+  return ans;
 }
 
 export function getTables() {

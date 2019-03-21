@@ -1,12 +1,11 @@
 import * as mongoose from 'mongoose';
-import {IOutcomeTableDocument, IOutcomeTableModel} from './table.model';
+import {IOutcomeTableDocument, IOutcomeTableModel, IOutcomeTableRow} from './table.model';
 import {ErrorCode} from '../util/errorcodes.info';
 import {GeoPoint} from '../util/typedef.util';
-
 const Schema = mongoose.Schema;
 
-// Document interface
-interface IYieldDocument extends mongoose.Document, IOutcomeTableDocument {
+// Row interface, values of each row without being a full-fledged document,
+interface IYieldRow extends IOutcomeTableRow {
   coords: GeoPoint;
   effectSize: number;
   sampleSize: number;
@@ -14,10 +13,16 @@ interface IYieldDocument extends mongoose.Document, IOutcomeTableDocument {
   interventionType: string;
 }
 
+// Document interface
+interface IYieldDocument extends mongoose.Document, IOutcomeTableDocument, IYieldRow {
+}
+
 // Model interface
 interface IYieldModel extends mongoose.Model<IYieldDocument>, IOutcomeTableModel<IYieldDocument> {
-  findByCoords(areaPoints: Array<number[]>, filters?: Object): Promise<Array<IYieldDocument>>;
-  findByStudy(studyId: string, filters?: Object): Promise<Array<IYieldDocument>>;
+  findByCoords(areaPoints: Array<number[]>,
+               filters?: Object,
+               cols?: {[col: string]: number}): Promise<Array<IYieldRow>>;
+  findByStudy(studyId: string, filters?: Object): Promise<Array<IYieldRow>>;
 }
 
 const YieldType = 'YIELD';
@@ -56,14 +61,16 @@ YieldSchema.index({ location: '2dsphere' });
 // Statics
 YieldSchema.statics = {
   /**
-  * Get
-  * @param {string} studyId - The studyId that we are trying to query.
+  * Get data
   * @param {[]number} areaPoints a set of points greater than 3 that represents an area on the map
   * @param {Object} filters? additional filters that we might want to include
-  * @returns {Promise<Array<IYieldDocument>>} Returns a Promise of the datapoints.
+  * @param {Object} cols? key contains name of the column and value is whether you want it
+  * @returns {Promise<Array<IYieldRow>>} Returns a Promise of the datapoints.
   */
   // todo vpineda figure out which type of queries we want to compute
-  findByCoords(areaPoints: Array<number[]>, filters?: Object): Promise<Array<IYieldDocument>> {
+  findByCoords(areaPoints: Array<number[]>,
+               filters?: Object,
+               cols?: {[col: string]: number}): Promise<Array<IYieldRow>> {
     let q = this.find();
     if (areaPoints && areaPoints.length > 2) {
       const polygon = {
@@ -76,12 +83,18 @@ YieldSchema.statics = {
       };
       q.where('coords').within(polygon);
     }
+
     if (filters) {
       q.where(filters)
     }
-    
-    return q.exec()
-      .then((dataPoints: Array<IYieldDocument>) => {
+
+    if (cols) {
+      q.select(cols)
+    }
+
+    let query = q.lean().exec();
+    return query
+      .then((dataPoints: Array<IYieldRow>) => {
         if (dataPoints && dataPoints.length) {
           return dataPoints;
         }
@@ -92,9 +105,10 @@ YieldSchema.statics = {
       });
   },
 
-  findByStudy(studyId: string, filters?: Object): Promise<Array<IYieldDocument>> {
+  findByStudy(studyId: string, filters?: Object): Promise<Array<IYieldRow>> {
     return this.findByCoords([], {
-      studyID: studyId
+      studyID: studyId,
+        ...filters
     });
   },
 
@@ -132,4 +146,4 @@ YieldSchema.statics = {
 
 const Yield: IYieldModel = <IYieldModel>mongoose.model('Yield', YieldSchema);
 
-export { Yield, IYieldDocument, YieldType };
+export { Yield, IYieldDocument,IYieldRow, YieldType };

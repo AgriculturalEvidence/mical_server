@@ -11,7 +11,8 @@ export default (api: restify.Server) => {
   api.get('/api/table/:table', controller.load, controller.query, controller.get);
 
   /** GET creates all of the datapoints needed for a smooth approximation to the function */
-  api.get('/api/table/histogram/:table', controller.load, controller.query, histController.build);
+  api.get('/api/table/histogram/:table', histController.prepare, controller.load,
+    controller.query, histController.build);
 
   /** GET the inteventions of a given table */
   api.get('/api/table/intervention/:table', controller.load, controller.getTableInterventions, controller.get);

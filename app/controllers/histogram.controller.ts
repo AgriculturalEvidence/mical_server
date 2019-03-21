@@ -1,12 +1,20 @@
 import * as restify from 'restify';
 import {logger} from '../../utils/logger';
-import {IOutcomeTableDocument} from '../models/table.model';
+import {IOutcomeTableDocument, IOutcomeTableRow} from '../models/table.model';
 import {ServerConstants} from '../util/constants.util';
 // @ts-ignore
 import * as science from 'science';
 import {ErrorCode, format} from '../util/errorcodes.info';
 import {Series, SeriesEntry} from '../util/typedef.util';
 import {Intervention} from '../models/intervention.model';
+
+/**
+ * Adds the necessary fields to the given query
+ */
+function prepare(req: restify.Request, res: restify.Response, next: restify.Next) {
+  req.params.cols = "effectSize,sampleSize";
+  next();
+}
 
 /**
  * Builds the histogram points
@@ -16,7 +24,7 @@ import {Intervention} from '../models/intervention.model';
  * @param req.params.int the intervention type, otherwise we return default histogram
  */
 function build(req: restify.Request, res: restify.Response, next: restify.Next) {
-  logger.info('build histogram');
+  logger.info('Building histogram....');
   let ticks = parseInt(req.params.ticks), samplePts = parseInt(req.params.samplePts);
   let interventionKey = parseInt(req.params.int);
   buildSeries(ticks, samplePts, req.params.docs, interventionKey).then((s) => {
@@ -29,7 +37,7 @@ function build(req: restify.Request, res: restify.Response, next: restify.Next) 
 
 async function buildSeries(ticks: number,
                            samplePts: number,
-                           docs: IOutcomeTableDocument[],
+                           docs: IOutcomeTableRow[],
                            interventionKey?: number): Promise<Series> {
   let sMetaPromise = getSeriesMetadata(interventionKey);
 
@@ -50,7 +58,7 @@ async function buildSeries(ticks: number,
  *          second array contains the values at each bucket delimited by ticks
  */
 
-async function group(rows: IOutcomeTableDocument[], ticks: number): Promise<[number[], number[], SeriesEntry]> {
+async function group(rows: IOutcomeTableRow[], ticks: number): Promise<[number[], number[], SeriesEntry]> {
   if (ticks < 2 || isNaN(ticks)) {
     return Promise.reject({
       code: ErrorCode.INVALID_NUMBER_OF_TICKS
@@ -58,7 +66,7 @@ async function group(rows: IOutcomeTableDocument[], ticks: number): Promise<[num
   }
   let max = -Infinity, min = Infinity;
   rows.forEach(r => {
-    let efS = r.get("effectSize", Number);
+    let efS = r["effectSize"];
     max = Math.max(max, efS);
     min = Math.min(min, efS);
   });
@@ -75,8 +83,8 @@ async function group(rows: IOutcomeTableDocument[], ticks: number): Promise<[num
   let buckets = Array(aTicks.length).fill(0.0);
   let sum = 0;
   rows.forEach(r => {
-    let efs = r.get("effectSize", Number);
-    let saSize = r.get("sampleSize", Number);
+    let efs = r["effectSize"];
+    let saSize = r["sampleSize"];
     // get idx of the tick that we want to jump to
     let tick = Math.floor((efs - min) * (ticks - 1) / (max- min));
     buckets[tick] +=  saSize;
@@ -162,4 +170,4 @@ async function getSeriesMetadata(key: number): Promise<Series> {
 }
 
 
-export { build }
+export { prepare, build }
