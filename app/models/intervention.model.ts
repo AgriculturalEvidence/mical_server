@@ -69,7 +69,7 @@ InterventionSchema.statics = {
         }
         return Promise.reject({
           code: ErrorCode.INT_NOT_FOUND,
-          i: intervention,
+          i: key,
         });
       });
   },
@@ -86,7 +86,7 @@ InterventionSchema.statics = {
         }
         return Promise.reject({
           code: ErrorCode.INT_NOT_FOUND,
-          i: intervention,
+          i: sKey,
         });
       });
   }

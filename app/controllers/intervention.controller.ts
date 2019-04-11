@@ -8,7 +8,15 @@ import {format} from '../util/errorcodes.info';
  * @returns {Array<IInterventionDocument>}
  */
 function load(req: restify.Request, res: restify.Response, next: restify.Next) {
-  Intervention.findByKey(parseInt(req.params.key, 10)).then((doc) => {
+  let k = parseInt(req.params.key, 10);
+  let fn: (a: (number|string)) => Promise<IInterventionDocument> =
+    Intervention.findByKey.bind(Intervention);
+  if (isNaN(k)) {
+    // then is a search on key
+    k = req.params.key.toLowerCase();
+    fn = Intervention.findByStringKey.bind(Intervention);
+  }
+  fn(k).then((doc) => {
     req.params.docs = doc;
     return next();
   }).catch((err) => {
