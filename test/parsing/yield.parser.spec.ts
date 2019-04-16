@@ -23,6 +23,9 @@ let parseOpts = {
             "sampleSize": "N sc 1",
             "studyId": "Study#",
             "interventionType": "intType",
+            "filterCols": {
+              "author": "Author",
+            },
     }
 };
 
@@ -72,7 +75,14 @@ describe("yield parsing integration test", function() {
             let yp = new YieldParser(parseOpts);
             let wb = XLSX.readFile(parseOpts.fileName);
 
-            let [f, _, cols] = yp.findColumns(wb, parseOpts.columnMapping);
+            let [f, _, cols] = yp.findColumns(wb, {
+              "xCoords": "X-coord deg",
+              "yCoords": "Y-coord deg",
+              "effectSize": "Yield ic 1",
+              "sampleSize": "N sc 1",
+              "studyId": "Study#",
+              "interventionType": "intType",
+            });
             equal(f, true, "should find all columns");
 
             expect(cols.yCoords).to.be.eq('T')
@@ -123,7 +133,12 @@ describe("yield parsing integration test", function() {
           "effectSize": "log ratio",
           "sampleSize": "sampleSize",
           "studyId": "Study#",
-          "interventionType": "intType"
+          "interventionType": "intType",
+          "filterCols": {
+            "crop": "Crop type",
+            "soil": "Soil pH",
+            "duration": "Duration of study",
+          },
         }
       };
 
@@ -138,8 +153,8 @@ describe("yield parsing integration test", function() {
 
       let yp = new YieldParser(parseOpts);
       function validation() {
-        Yield.findByStudy("12_1").then((values) => {
-          console.log(values.length);
+        Yield.findByStudy("13_1").then((values) => {
+          expect(values.length).to.be.eq(2);
           done();
         }, (err) => done(err));
       }

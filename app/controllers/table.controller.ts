@@ -1,11 +1,16 @@
 import * as restify from 'restify';
 import {IInterventionDocument, Intervention} from '../models/intervention.model';
 import {logger} from '../../utils/logger';
-import {Yield} from '../models/yield.model';
-import * as mongoose from 'mongoose';
-import {IOutcomeTableDocument, IOutcomeTableModel, getCoordsPolygon, getQueryFilters, getQueryCols} from '../models/table.model';
+import * as Table from '../models/table.model';
+import {
+  getCoordsPolygon,
+  getQueryCols,
+  getQueryFilters,
+  IOutcomeTableDocument,
+  IOutcomeTableModel
+} from '../models/table.model';
 import {format} from '../util/errorcodes.info';
-import * as Table from '../models/table.model'
+
 /**
  * Search get all tables
  */
@@ -34,6 +39,23 @@ function query(req: restify.Request, res: restify.Response, next: restify.Next) 
       logger.error("Query:", format(err));
       res.json(format(err).status, format(err).msg);
     })
+}
+
+/**
+ * Returns the unique values of a given column in the table
+ * @param req.param.table the query table
+ * @param req.param.column the column that we will use
+ */
+function unique(req: restify.Request, res: restify.Response, next: restify.Next) {
+  Table.unique(req.params.table,
+    req.params.column)
+    .then((data) => {
+    req.params.docs = data;
+    next();
+  }).catch(err => {
+    logger.error("Unique:", format(err));
+    res.json(format(err).status, format(err).msg);
+  })
 }
 
 /**
@@ -69,4 +91,4 @@ function get(req: restify.Request, res: restify.Response, next: restify.Next) {
   res.json(200, req.params.docs);
 }
 
-export { get, load, query, getTableInterventions };
+export { get, load, query, unique, getTableInterventions };

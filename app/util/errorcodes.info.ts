@@ -1,6 +1,7 @@
 export enum ErrorCode {
   TABLE_NOT_FOUND,
   INT_NOT_FOUND,
+  NO_UNIQUE_VALUES,
 
   INVALID_NUMBER_OF_TICKS,
   INVALID_NUMBER_OF_SAMPLE_PTS,
@@ -51,6 +52,11 @@ export function format(error: ErrorInfo): {status: number, msg: string} {
       return {
         status: 400, 
         msg: "Invalid number of ticks"
+      }
+    case ErrorCode.NO_UNIQUE_VALUES:
+      return {
+        status: 404,
+        msg: "There are no unique values in column " + err.col,
       }
   }
   return {

@@ -11,6 +11,7 @@ interface IYieldRow extends IOutcomeTableRow {
   sampleSize: number;
   studyID: string;
   interventionType: string;
+  filterCols: {[key: string]: string};
 }
 
 // Document interface
@@ -23,6 +24,7 @@ interface IYieldModel extends mongoose.Model<IYieldDocument>, IOutcomeTableModel
                filters?: Object,
                cols?: {[col: string]: number}): Promise<Array<IYieldRow>>;
   findByStudy(studyId: string, filters?: Object): Promise<Array<IYieldRow>>;
+  findUnique(col: string): Promise<string[]>;
 }
 
 const YieldType = 'YIELD';
@@ -54,6 +56,11 @@ const YieldSchema = new Schema({
   interventionType: {
     type: Number,
     required: true,
+  },
+  filterCols: {
+    type: Object,
+    required: true,
+    default: {}
   }
 });
 YieldSchema.index({ location: '2dsphere' });
@@ -112,19 +119,14 @@ YieldSchema.statics = {
     });
   },
 
-  findByInterventionType(interventionKey: number): Promise<IYieldDocument[]> {
-    let q = this.find({
-      interventionType: interventionKey,
-    });
-
-    return q.exec()
-      .then((dataPoints: Array<IYieldDocument>) => {
-        if (dataPoints && dataPoints.length) {
-          return dataPoints;
-        }
+  findUnique(col: string): Promise<string[]> {
+    let query = this.distinct(col).lean().exec();
+    return query
+      .then((data: string[]) => {
+        if (data && data.length) return data;
         return Promise.reject({
-          code: ErrorCode.YIELD_NO_INTERVENTION_OF_TYPE,
-          key: interventionKey,
+          code: ErrorCode.NO_UNIQUE_VALUES,
+          col: col,
         });
       });
   },

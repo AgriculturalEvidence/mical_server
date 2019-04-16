@@ -8,11 +8,20 @@ import { logger } from '../utils/logger';
 const pathToRoutes: string = path.join(config.root, '/app/routes');
 
 // create Restify server with the configured name
-const app: restify.Server = restify.createServer({ name: config.name });
+const app: restify.Server = restify.createServer({
+  name: config.name,
+  ignoreTrailingSlash: true,
+});
 
 // parse the body of the request into req.params
-app.use(restify.bodyParser());
-app.use(restify.queryParser());
+app.use(restify.plugins.bodyParser({
+  mapParams: true,
+}));
+app.use(restify.plugins.queryParser({
+  mapParams: true,
+}));
+
+app.pre(restify.pre.dedupeSlashes());
 
 // user-defined middleware
 app.use((req: any, res: any, next: any) => {

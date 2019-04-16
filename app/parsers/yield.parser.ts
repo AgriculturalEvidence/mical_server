@@ -1,5 +1,5 @@
 import {IStudyDocument} from '../models/studies.model';
-import {IYieldDocument, Yield} from '../models/yield.model';
+import {IYieldDocument, IYieldRow, Yield} from '../models/yield.model';
 import {ColumDesc, ParseJob, Parser} from './paper.parser';
 import {WorkBook, WorkSheet} from 'xlsx';
 import {parseRef} from '../util/excel.helpers.util';
@@ -17,8 +17,10 @@ interface YieldJob extends ParseJob {
     effectSize: string,
     sampleSize: string,
     studyId: string,
-    interventionType: string
-    [key: string]: string,
+    interventionType: string,
+    filterCols: {
+      [key: string]: string,
+    }
   };
 }
 
@@ -42,13 +44,28 @@ function validRow(newData: any) {
   return typeof newData.sampleSize === 'number';
 }
 
+type F = {
+  [s: string] : F | string
+};
+
+function flatten(obj: F, acc: {[key: string]: string} = {}) {
+  let keys = Object.keys(obj);
+  for (let i = 0; i < keys.length; i++) {
+    if (typeof obj[keys[i]] == 'object') {
+      flatten(<F>obj[keys[i]], acc);
+    } else {
+      acc[keys[i]] = <string>obj[keys[i]];
+    }
+  }
+}
+
 class YieldParser extends Parser {
 
   constructor(public yieldJob: YieldJob) {
     super();
   }
 
-  prepareRows(ws: WorkSheet, colInfo: ColumDesc) : Promise<IYieldDocument[]> {
+  prepareRows(ws: WorkSheet, colInfo: ColumDesc) : Promise<IYieldRow[]> {
     let [_, numRows] = parseRef(ws["!ref"]);
     let rowPromises = [];
     console.log(colInfo);
@@ -66,13 +83,21 @@ class YieldParser extends Parser {
         let samS = ws[colInfo.sampleSize + rowIdx];
         let studID = ws[colInfo.studyId + rowIdx];
 
-        if (!x) logger.info("Dropping row due to x");
-        if (!y) logger.info("Dropping row due to y");
-        if (!effS) logger.info("Dropping row due to effs");
-        if (!samS) logger.info("Dropping row due to sams");
-        if (!studID) logger.info("Dropping row due to studyid");
+        if (!x) logger.info(`Dropping row ${rowIdx} due to x`);
+        if (!y) logger.info(`Dropping row ${rowIdx} due to y`);
+        if (!effS) logger.info(`Dropping row ${rowIdx} due to effs`);
+        if (!samS) logger.info(`Dropping row ${rowIdx} due to sams`);
+        if (!studID) logger.info(`Dropping row ${rowIdx} due to studyid`);
 
-        let retv =  {
+        // parse filter cols
+        let filterObj: {[key: string]: string} = {};
+
+        Object.keys(this.yieldJob.columnMapping.filterCols).map(k => {
+          if(ws[colInfo[k] + rowIdx] !== undefined)
+            filterObj[k] = ws[colInfo[k] + rowIdx].v;
+        });
+
+        return {
           coords: {
             type: 'Point',
             coordinates: [x.v, y.v],
@@ -80,9 +105,9 @@ class YieldParser extends Parser {
           effectSize: effS.v,
           sampleSize: samS.v,
           studyID: this.yieldJob.studyDef.id + "_" + studID.v,
-          interventionType: interventionRow.key
+          interventionType: interventionRow.key,
+          filterCols: filterObj,
         };
-        return new Promise((d) => d(retv));
       }).catch((err) => {
         logger.error("Cannot find intervention type for row, ", err);
         return null;
@@ -100,15 +125,24 @@ class YieldParser extends Parser {
   async run(): Promise<number> {
     try {
       let wb: WorkBook = XLSX.readFile(this.yieldJob.fileName);
-      let [found, ws, cols] = this.findColumns(wb, this.yieldJob.columnMapping);
+      let arg : {[key: string]: string} = {};
+      flatten(this.yieldJob.columnMapping, arg);
+      let [found, ws, cols] = this.findColumns(wb, arg);
       if (!found) {
         logger.error("Couldn't find all cols, aborting!");
         return 0;
       }
       let rows = this.prepareRows(ws, cols);
-      return rows.then(rs =>
-        Promise.all(rs.map(r => new Yield(r).save()))
-      ).then((rows) => rows.length)
+      return rows.then(rows => {
+        return new Promise(((resolve, reject) => {
+          Yield.collection.insertMany(rows, (error, result) => {
+            if (error) reject(error);
+            resolve(result);
+          })
+        }));
+      }).then((ans: any) => {
+        return ans.insertedCount;
+      })
     } catch (e) {
       console.log(e.stack);
       return Promise.reject("Error handling file: " + JSON.stringify(e));

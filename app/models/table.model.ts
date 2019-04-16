@@ -1,8 +1,9 @@
 import * as mongoose from 'mongoose';
-import { Yield } from './yield.model';
+import {Yield} from './yield.model';
 import {logger} from '../../utils/logger';
-import { ErrorCode } from '../util/errorcodes.info';
-import { PerformanceObserver, performance } from 'perf_hooks';
+import {ErrorCode} from '../util/errorcodes.info';
+import {performance} from 'perf_hooks';
+
 let atob = require('atob');
 
 // Row interface, values of each row without being a full-fledged document,
@@ -11,6 +12,7 @@ export interface IOutcomeTableRow {
   interventionType: string;
   effectSize: number;
   sampleSize: number;
+  filterCols: {[key: string]: string};
 }
 
 export interface IOutcomeTableDocument extends mongoose.Document, IOutcomeTableRow {
@@ -20,7 +22,7 @@ export interface IOutcomeTableModel<T> {
   findByCoords(areaPoints: Array<number[]>,
                filters?: Object,
                cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>>
-  findByInterventionType(interventionKey: number): Promise<T[]>;
+  findUnique(col: string): Promise<string[]>
   getAllInterventionTypes(): Promise<number[]>;
 }
 
@@ -98,6 +100,27 @@ export async function query(tableStr: string, coords: number[][],
   }
   // todo vpineda add the query cols that we want to show
   let ans = await table.findByCoords(coords, filters, cols);
+
+  logger.trace("Query took: " + (performance.now() - startT) + " millis");
+  return ans;
+}
+
+/**
+ * Queries the given table for unique names in the given column
+ * @param tableStr table name
+ * @param col name of the given column
+ */
+export async function unique(tableStr: string, col: string): Promise<string[]> {
+
+  let startT = performance.now();
+
+  let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
+  if (!table) {
+    logger.error("Table name given in request is not valid")
+    return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
+  }
+  // todo vpineda add the query cols that we want to show
+  let ans = await table.findUnique(col);
 
   logger.trace("Query took: " + (performance.now() - startT) + " millis");
   return ans;

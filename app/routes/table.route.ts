@@ -8,7 +8,10 @@ export default (api: restify.Server) => {
   api.get('/api/table/', controller.load, controller.get);
 
   /** GET the data on a table, pass in filters through query params */
-  api.get('/api/table/:table', controller.load, controller.query, controller.get);
+  api.get('/api/table/:table', controller.query, controller.get);
+
+  /** GET all of the distinct values in a given column */
+  api.get('/api/table/:table/:column', controller.unique, controller.get);
 
   /** GET creates all of the datapoints needed for a smooth approximation to the function */
   api.get('/api/table/histogram/:table', histController.prepare, controller.load,
@@ -16,4 +19,5 @@ export default (api: restify.Server) => {
 
   /** GET the inteventions of a given table */
   api.get('/api/table/intervention/:table', controller.load, controller.getTableInterventions, controller.get);
+
 };
