@@ -9,7 +9,7 @@ let atob = require('atob');
 // Row interface, values of each row without being a full-fledged document,
 // helpful when querying a lot of data
 export interface IOutcomeTableRow {
-  interventionType: string;
+  interventionType: number;
   effectSize: number;
   sampleSize: number;
   filterCols: {[key: string]: string};

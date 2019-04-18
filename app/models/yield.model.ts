@@ -10,7 +10,7 @@ interface IYieldRow extends IOutcomeTableRow {
   effectSize: number;
   sampleSize: number;
   studyID: string;
-  interventionType: string;
+  interventionType: number;
   filterCols: {[key: string]: string};
 }
 
