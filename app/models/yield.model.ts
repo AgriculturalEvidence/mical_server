@@ -83,12 +83,12 @@ YieldSchema.statics = {
       const polygon = {
         'type' : 'Polygon',
         'coordinates' : [areaPoints],
-        crs: {
-          type: "name",
-          properties: { name: "urn:x-mongodb:crs:strictwinding:EPSG:4326" }
-        }
+        // crs: {
+        //   type: "name",
+        //   properties: { name: "urn:x-mongodb:crs:strictwinding:EPSG:4326" }
+        // }
       };
-      q.where('coords').within(polygon);
+      q = q.where('coords').within(polygon);
     }
 
     if (filters) {
