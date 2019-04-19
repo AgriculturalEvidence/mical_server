@@ -19,6 +19,7 @@
     "atob": "^2.1.2",
     "bunyan-debug-stream": "^2.0.0",
     "geojson": "^0.5.0",
+    "kernel-smooth": "^0.2.3",
     "mongoose": "^4.13.18",
     "restify": "^8.3.0",
     "science": "^1.9.3",

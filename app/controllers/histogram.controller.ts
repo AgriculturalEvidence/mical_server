@@ -2,8 +2,7 @@ import * as restify from 'restify';
 import {logger} from '../../utils/logger';
 import {IOutcomeTableDocument, IOutcomeTableRow} from '../models/table.model';
 import {ServerConstants} from '../util/constants.util';
-// @ts-ignore
-import * as science from 'science';
+const ks = require('kernel-smooth');
 import {ErrorCode, format} from '../util/errorcodes.info';
 import {Series, SeriesEntry} from '../util/typedef.util';
 import {Intervention} from '../models/intervention.model';
@@ -96,7 +95,7 @@ async function group(rows: IOutcomeTableRow[], ticks: number): Promise<[number[]
   let getloc = (idx: number) => {
     if (idx == 0) return min;
     if (idx == buckets.length - 1) return max;
-    return aTicks[idx - 1] + ((aTicks[idx] - aTicks[idx - 1]) / 2) ;
+    return aTicks[idx] ;
   };
   // normalize
   let nBuckets = buckets.map((v, idx) => <[number, number]>[getloc(idx) , v/sum]);
@@ -117,7 +116,7 @@ async function sampleDistribution(aTicks: number[], buckets : number[], samplePt
     })
   }
   // build kernel
-  let kde = science.stats.kde().sample(buckets);
+  let kde = ks.density(buckets, ks.fun.gaussian, 0.3);
   let pts = Array(aTicks.length * samplePts);
   // sample pts
   let step = (aTicks[1] - aTicks[0]) / samplePts;
@@ -130,16 +129,17 @@ async function sampleDistribution(aTicks: number[], buckets : number[], samplePt
 
   // @look at Scott, D. W. (1992) Multivariate Density Estimation: Theory, Practice, and
   // Visualization. Wiley.
-  let dist1 =  kde.bandwidth(science.stats.bandwidth.nrd)(pts);
+  // let dist1 =  kde.bandwidth(science.stats.bandwidth.nrd)(pts);
 
-  if (dist1[0] !== undefined && !isNaN(dist1[0][1])) {
-    return dist1;
-  }
+  // if (dist1[0] !== undefined && !isNaN(dist1[0][1])) {
+  //   return dist1;
+  // }
 
   // sometimes that distribution doesnt work, if the third and first quartiles are the same
   // if we fail try the fallback, not as good but should do the trick
   // @lookat  Silverman, B. W. (1986) Density Estimation. London: Chapman and Hall.
-  return kde.bandwidth(science.stats.bandwidth.nrd0)(pts);
+
+  return <any> pts.map((x) => [x, kde(x)]);
 }
 
 /**
