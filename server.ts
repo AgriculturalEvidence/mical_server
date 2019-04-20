@@ -9,9 +9,6 @@ mongoose.Promise = global.Promise;
 // connect to mongodb
 const options = {
   keepAlive: 1,
-  auth: {
-    authdb: 'admin'
-  },
   user: config.dbUser,
   pass: config.dbPass,
   useMongoClient: true,
@@ -32,7 +29,7 @@ db.on('error', (err: any) => {
 // start the server as soon as db connection is made
 db.once('open', () => {
   logger.info(`Connected to database: ${config.db}`);
-  app.listen(config.port, () => {
+  app.listen(config.port, '0.0.0.0', () => {
     logger.info(`${config.name} is running at ${app.url}`);
   });
 });

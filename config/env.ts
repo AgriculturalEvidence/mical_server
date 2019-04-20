@@ -49,6 +49,25 @@ if (env === 'production') {
   config.debug = false;
 }
 
+
+if ( process.env.MONGO_URL ) {
+  config.db = process.env.MONGO_URL;
+}
+
+if ( process.env.PORT ) {
+  config.port = parseInt(process.env.PORT);
+}
+
+if ( process.env.DB_USER ) {
+  config.dbUser = process.env.DB_USER;
+}
+
+if ( process.env.DB_PASS ) {
+  config.dbPass = process.env.DB_PASS;
+}
+
+console.log(JSON.stringify(config, null, '\t'));
+
 const defaultYieldParsingParams = {
   fileName: "yield.xlsx",
   columnMapping: {

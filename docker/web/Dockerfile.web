@@ -1,0 +1,25 @@
+FROM node:lts-alpine as build
+
+# install deps
+RUN apk add --no-cache git nginx
+
+# build web image
+WORKDIR /build
+RUN git clone https://github.com/AgriculturalEvidence/mical.git client; \
+    cd client; \
+    npm install; \
+    npx ng build --prod --aot;
+
+RUN mv client/dist/* ./;
+
+# move files to ngnix delpoyment
+FROM nginx:alpine
+
+EXPOSE 8080
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.default.conf /etc/nginx/conf.d/default.conf.template
+COPY --from=build /build/AgriculturalEvidence/* /usr/share/nginx/html/
+
+CMD envsubst '\$PORT' < \
+    /etc/nginx/conf.d/default.conf.template > \
+    /etc/nginx/conf.d/default.conf; nginx -g 'daemon off;';
