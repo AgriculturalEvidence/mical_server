@@ -130,7 +130,7 @@ async function run() {
   }
 }
 
-serverBoot.db.once('open', function () {
+serverBoot.db.then(function () {
   setTimeout(run, 100);
 });
 

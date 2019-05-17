@@ -8,6 +8,7 @@ interface ConfigSettings {
   db: string;
   dbUser: string;
   dbPass: string;
+  connOpts: object;
   debug: boolean;
   github: {
     clientID: string;
@@ -34,6 +35,7 @@ const config: ConfigSettings = {
     clientSecret: process.env.GITHUB_SECRET,
     callbackURL: ''
   },
+  connOpts: { auth: { authSource: "admin" } },
 };
 
 // settings for test environment
@@ -60,6 +62,9 @@ if ( process.env.PORT ) {
 
 if ( process.env.DB_USER ) {
   config.dbUser = process.env.DB_USER;
+  if (process.env.DB_USER !== "root") {
+    config.connOpts = {}
+  }
 }
 
 if ( process.env.DB_PASS ) {

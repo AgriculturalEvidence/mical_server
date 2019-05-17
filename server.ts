@@ -8,30 +8,27 @@ mongoose.Promise = global.Promise;
 
 // connect to mongodb
 const options = {
-  keepAlive: 1,
   user: config.dbUser,
   pass: config.dbPass,
-  useMongoClient: true,
+  useNewUrlParser: true,
+  keepAlive: true,
+  keepAliveInitialDelay: 300000,
+  ...config.connOpts,
 };
-
-const db = <any>mongoose.connect(config.db, options);
+const db = mongoose.connect(config.db, <any>options);
 
 // print mongoose logs in dev and test env
 if (config.debug) {
   mongoose.set('debug', true);
 }
 
-// throw error on db error
-db.on('error', (err: any) => {
-  throw new Error(`Unable to connect to database: ${err}`);
-});
-
-// start the server as soon as db connection is made
-db.once('open', () => {
+db.then(() => {
   logger.info(`Connected to database: ${config.db}`);
   app.listen(config.port, '0.0.0.0', () => {
     logger.info(`${config.name} is running at ${app.url}`);
   });
+}, (err: any) => {
+  console.log(`Unable to connect to database: ${err}, url ${config.db},opts: ${JSON.stringify(options, null , '\t')}`);
 });
 
 export { app, db };

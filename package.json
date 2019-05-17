@@ -11,7 +11,7 @@
     "@types/chai": "^3.5.2",
     "@types/geojson": "^7946.0.7",
     "@types/mocha": "^5.2.6",
-    "@types/mongoose": "^4.7.45",
+    "@types/mongoose": "^5.5.1",
     "@types/restify": "^7.2.9",
     "@types/sinon": "^1.16.34",
     "@types/supertest": "^2.0.7",
@@ -20,7 +20,7 @@
     "bunyan-debug-stream": "^2.0.0",
     "geojson": "^0.5.0",
     "kernel-smooth": "^0.2.3",
-    "mongoose": "^4.13.18",
+    "mongoose": "^5.5.1",
     "restify": "^8.3.0",
     "science": "^1.9.3",
     "xlsx": "^0.14.2"
