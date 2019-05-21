@@ -72,6 +72,13 @@ async function group(rows: IOutcomeTableRow[], ticks: number): Promise<[number[]
 
   if (max === min) max += 1;
 
+  // make the graph "symetric"
+  if (Math.abs(min) > Math.abs(max)) {
+    max = Math.abs(min);
+  } else {
+    min = - Math.abs(max);
+  }
+
   // create ticks
   let aTicks: number[] = [];
   for (let i = 0; i < ticks; i++) {
@@ -86,6 +93,7 @@ async function group(rows: IOutcomeTableRow[], ticks: number): Promise<[number[]
     let saSize = r["sampleSize"];
     // get idx of the tick that we want to jump to
     let tick = Math.floor((efs - min) * (ticks - 1) / (max- min));
+    if (tick >= buckets.length) return;
     buckets[tick] +=  saSize;
     sum += saSize;
   });
