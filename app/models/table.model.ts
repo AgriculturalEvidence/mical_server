@@ -42,15 +42,20 @@ export function getCoordsPolygon(str: string): number[][] {
     return [];
   }
   const points = area.split(',').map(num => parseFloat(num));
-  if (points.length < 6 || points.length % 2) {
+  if (points.length != 4) {
     return [];
   }
+
+  // todo: AE-45
+  if (points[1] > 180) points[1] = 180;
+  if (points[3] < -180) points[3] = -180;
+
   let corners: number[][] = [];
-  for (let i = 0; i < points.length; i += 2) {
-    // swap the order 
-    corners.push([points[i + 1], points[i]]);
-  }
-  corners.push(corners[0]);
+  corners.push([points[3], points[0]]);
+  corners.push([points[3], points[2]]);
+  corners.push([points[1], points[2]]);
+  corners.push([points[1], points[0]]);
+  corners.push([points[3], points[0]]);
   return corners;
 }
 

@@ -141,7 +141,7 @@ function epanechnikovKde(sample: IOutcomeTableRow[]) {
 /**
  * Samples the distribution at sample points at each bucket
  * @param aTicks the ticks that generated the histogram
- * @param buckets values of the histogram
+ * @param rows query rows
  * @param samplePts number of samples per bucket
  */
 async function sampleDistribution(aTicks: number[], rows : IOutcomeTableRow[], samplePts: number): Promise<[number, number][]> {

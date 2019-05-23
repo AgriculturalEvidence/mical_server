@@ -17,6 +17,12 @@ export interface ErrorInfo {
 
 export function format(error: ErrorInfo): {status: number, msg: string} {
   let err: any = error;
+  if (err.errmsg) {
+    return {
+      status: 500,
+      msg: err.errmsg,
+    }
+  }
   switch (error.code) {
     case ErrorCode.INT_NOT_FOUND:
       return {
