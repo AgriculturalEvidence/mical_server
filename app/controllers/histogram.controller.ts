@@ -40,8 +40,8 @@ async function buildSeries(ticks: number,
                            interventionKey?: number): Promise<Series> {
   let sMetaPromise = getSeriesMetadata(interventionKey);
 
-  let [aTicks, hist, nHist] = await group(docs, ticks);
-  let distPts = await sampleDistribution(aTicks, hist, samplePts);
+  let [aTicks, nHist] = await group(docs, ticks);
+  let distPts = await sampleDistribution(aTicks, docs, samplePts);
 
   let series: Series = await sMetaPromise;
   series.ticks = aTicks;
@@ -57,7 +57,7 @@ async function buildSeries(ticks: number,
  *          second array contains the values at each bucket delimited by ticks
  */
 
-async function group(rows: IOutcomeTableRow[], ticks: number): Promise<[number[], number[], SeriesEntry]> {
+async function group(rows: IOutcomeTableRow[], ticks: number): Promise<[number[], SeriesEntry]> {
   if (ticks < 2 || isNaN(ticks)) {
     return Promise.reject({
       code: ErrorCode.INVALID_NUMBER_OF_TICKS
@@ -108,7 +108,34 @@ async function group(rows: IOutcomeTableRow[], ticks: number): Promise<[number[]
   // normalize
   let nBuckets = buckets.map((v, idx) => <[number, number]>[getloc(idx) , v/sum]);
 
-  return [aTicks, buckets, nBuckets];
+  return [aTicks, nBuckets];
+}
+
+function epanechnikovKde(sample: IOutcomeTableRow[]) {
+  /* Epanechnikov kernel */
+  function epanechnikov(u : number) {
+    return Math.abs(u) <= 1 ? 0.75 * (1 - u*u) : 0;
+  };
+
+  var kernel = epanechnikov;
+  let sum = sample.reduce((acc, r) => acc + r["sampleSize"], 0);
+  return {
+    scale: function(h: number) {
+      kernel = function (u) { return epanechnikov(u / h) / h; };
+      return this;
+    },
+
+    points: function(points: number[]) {
+      return points.map(function(x) {
+        var y = sample.reduce(function (acc, r) {
+          let efs = r["effectSize"];
+          let saSize = r["sampleSize"];
+          return acc + kernel(x - efs)*saSize;
+        }, 0) / sum;
+        return [x, y];
+      });
+    }
+  }
 }
 
 /**
@@ -117,14 +144,15 @@ async function group(rows: IOutcomeTableRow[], ticks: number): Promise<[number[]
  * @param buckets values of the histogram
  * @param samplePts number of samples per bucket
  */
-async function sampleDistribution(aTicks: number[], buckets : number[], samplePts: number): Promise<[number, number][]> {
+async function sampleDistribution(aTicks: number[], rows : IOutcomeTableRow[], samplePts: number): Promise<[number, number][]> {
   if (samplePts < 1 || isNaN(samplePts)) {
     return Promise.reject({
       code: ErrorCode.INVALID_NUMBER_OF_SAMPLE_PTS
     })
   }
   // build kernel
-  let kde = ks.density(buckets, ks.fun.gaussian, 0.3);
+  let kde = epanechnikovKde(rows);
+
   let pts = Array(aTicks.length * samplePts);
   // sample pts
   let step = (aTicks[1] - aTicks[0]) / samplePts;
@@ -147,7 +175,7 @@ async function sampleDistribution(aTicks: number[], buckets : number[], samplePt
   // if we fail try the fallback, not as good but should do the trick
   // @lookat  Silverman, B. W. (1986) Density Estimation. London: Chapman and Hall.
 
-  return <any> pts.map((x) => [x, kde(x)]);
+  return <any> kde.points(pts);
 }
 
 /**
