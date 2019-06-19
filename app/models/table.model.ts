@@ -4,6 +4,7 @@ import {logger} from '../../utils/logger';
 import {ErrorCode} from '../util/errorcodes.info';
 import {performance} from 'perf_hooks';
 import { createAreaFilter } from '../util/location.util';
+import { AggregateCalculator } from '../util/aggregation.util';
 
 let atob = require('atob');
 
@@ -86,6 +87,26 @@ export function getQueryCols(str: string): {[col: string]: number } {
   return obj;
 }
 
+export async function aggregate(tableStr: string, aggCalculator: AggregateCalculator, 
+  coords: number[][], filters?: Object): Promise<Array<IOutcomeTableRow>> {
+  
+  let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
+  if (!table) {
+    logger.error("Table name given in request is not valid")
+    return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
+  }
+
+  let areaFilter = createAreaFilter(coords);
+  let match = {
+    "$and": [filters, areaFilter] 
+  };
+  
+  return (<any>table).aggregate([
+    { "$match": match },
+    ... aggCalculator.build()
+  ]).exec();
+}
+
 /**
  * Queries the given table within coords and with a given set of filters. If you
  * need special columns you can specify them inside of the cols param
@@ -106,7 +127,6 @@ export async function query(tableStr: string, coords: number[][],
   }
   
   let areaFilter = createAreaFilter(coords);
-
   let ans = await table.findRows({
     "$and": [filters, areaFilter] 
   }, cols);

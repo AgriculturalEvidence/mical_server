@@ -88,6 +88,11 @@ YieldSchema.statics = {
       });
   },
 
+  /**
+   * Builds the actual query object that will be used to query the database
+   * @param filters JSON description of the datapoints
+   * @param cols cols that we need to query
+   */
   buildQuery(filters?: Object, cols?: {[col: string]: number}) {
     let q = this.find();
 

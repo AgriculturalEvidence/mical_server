@@ -1,11 +1,12 @@
 import * as restify from 'restify';
 import {logger} from '../../utils/logger';
-import {IOutcomeTableDocument, IOutcomeTableRow} from '../models/table.model';
+import {IOutcomeTableDocument, IOutcomeTableRow, aggregate, getCoordsPolygon, getQueryFilters} from '../models/table.model';
 import {ServerConstants} from '../util/constants.util';
 const ks = require('kernel-smooth');
 import {ErrorCode, format} from '../util/errorcodes.info';
 import {Series, SeriesEntry} from '../util/typedef.util';
 import {Intervention, IInterventionDocument} from '../models/intervention.model';
+import { CAPTION_OPT, AggregateCalculator } from '../util/aggregation.util';
 
 /**
  * Adds the necessary fields to the given query
@@ -26,7 +27,10 @@ function build(req: restify.Request, res: restify.Response, next: restify.Next) 
   logger.info('Building histogram....');
   let ticks = parseInt(req.params.ticks), samplePts = parseInt(req.params.samplePts);
   let interventionKey = parseInt(req.params.int);
-  buildSeries(ticks, samplePts, req.params.docs, interventionKey).then((s) => {
+  let sMetaPromise = getSeriesMetadata(interventionKey);
+  let sCaptionPromise = processCaption(sMetaPromise, req);
+  buildSeries(ticks, samplePts, req.params.docs, sMetaPromise).then(async (s) => {
+    s.desc = await sCaptionPromise;
     res.json(200, s);
   }).catch(err => {
     logger.error("Histogram build: ", err);
@@ -37,9 +41,7 @@ function build(req: restify.Request, res: restify.Response, next: restify.Next) 
 async function buildSeries(ticks: number,
                            samplePts: number,
                            docs: IOutcomeTableRow[],
-                           interventionKey?: number): Promise<Series> {
-  let sMetaPromise = getSeriesMetadata(interventionKey);
-  let sCaptionPromise = processCaption(sMetaPromise);
+                           sMetaPromise: Promise<Series>): Promise<Series> {
 
   let [aTicks, nHist] = await group(docs, ticks);
   let distPts = await sampleDistribution(aTicks, docs, samplePts);
@@ -49,8 +51,6 @@ async function buildSeries(ticks: number,
   series.ticks = aTicks;
   series.bar = nHist;
   series.dist = distPts;
-  
-  series.desc = await sCaptionPromise;
   return series;
 }
 
@@ -156,15 +156,26 @@ async function sampleDistribution(aTicks: number[], rows : IOutcomeTableRow[], s
   }
   // build kernel
   let kde = epanechnikovKde(rows);
-
-  let pts = Array(aTicks.length * samplePts);
-  // sample pts
+  let offsetPts = samplePts;
+  let pts = Array((aTicks.length + 2) * samplePts);
+  
   let step = (aTicks[1] - aTicks[0]) / samplePts;
+  // offset pts
+  for(let i = 0; i < offsetPts; i++) {
+    pts[i] = aTicks[0] - (step * (offsetPts - i))/ 2
+  }
+
+  // sample pts
   for (let i = 0; i < aTicks.length; i++) {
     let start = aTicks[i];
     for(let j = 0; j < samplePts; j ++) {
-      pts[i*samplePts + j] = start + j*step;
+      pts[i*samplePts + j + offsetPts] = start + j*step;
     }
+  }
+
+  // offset pts
+  for(let i = 0; i < offsetPts; i++) {
+    pts[i + (aTicks.length + 1) * samplePts] = aTicks[aTicks.length - 1] - (step * i)/ 2
   }
 
   // @look at Scott, D. W. (1992) Multivariate Density Estimation: Theory, Practice, and
@@ -182,22 +193,34 @@ async function sampleDistribution(aTicks: number[], rows : IOutcomeTableRow[], s
   return <any> kde.points(pts);
 }
 
-const CAPTION_STRS = ["AVG", "MEDIAN"];
-class CaptionCalculator {
-  constructor(query: Object) {
-  }
-}
-
-enum CAPTION_OPTS {
-  AVG,
-  MEADIAN,
-}
-
-async function processCaption(seriesInfo: Promise<Series>): Promise<string> {
-  // todo vpineda
+async function processCaption(seriesInfo: Promise<Series>, req : restify.Request): Promise<string> {
   let {desc} = await seriesInfo;
   let token = desc.split(" ");
-  return "";
+  let tIdxs: number[] = [];
+  let reqCapts = CAPTION_OPT.map((c, idx) => {
+    let tIdx = -1;
+    let valid = token.some(t => {
+      tIdx++;
+      return (("${" + c + "}") === t) 
+    });
+    if (valid) tIdxs.push(tIdx);
+    return valid ? idx : -1;
+  }).filter(i => i != -1);
+  if(reqCapts.length == 0) return token.join(" ");
+
+  let ac = new AggregateCalculator(reqCapts);
+  let aggAns = await aggregate(req.params.table,
+    ac, getCoordsPolygon(req.params.area),
+    getQueryFilters(req.params.f, req.params.int));
+  let calculated = ac.get(aggAns);
+
+  tIdxs.forEach((tIdx, idx) => {
+    let addPercent = calculated[idx] < 10 && calculated[idx] > -10
+    if (addPercent) calculated[idx] *= 100;
+    token[tIdx] = calculated[idx].toPrecision(3) + (addPercent ? "%" : "");
+  });
+
+  return token.join(" ");
 }
 
 /**
@@ -206,7 +229,9 @@ async function processCaption(seriesInfo: Promise<Series>): Promise<string> {
  */
 async function getSeriesMetadata(key: number): Promise<Series> {
   try {
-    let interventionEntry = await Intervention.findByKey(key);
+    let interventionEntry: any = await new Promise((a, r) => {
+      Intervention.findByKey(key).then(v => a(v), v => r(v));
+    });
     return {
       labels: {
         denom: interventionEntry.denom,
@@ -214,7 +239,7 @@ async function getSeriesMetadata(key: number): Promise<Series> {
       },
       title: interventionEntry.title,
       bar: [], dist: [], ticks: [],
-      desc: "",
+      desc: interventionEntry.desc,
     }
   } catch (e) {
     return {

@@ -251,6 +251,34 @@ describe('table API (with yield API)', () => {
               done();
             }
           });
+      });
+
+      it("should return a valid histogram definition", (done) => {
+        supertest(app)
+          .get('/api/table/histogram/yield?ticks=5&samplePts=2')
+          .end((err: any, res: supertest.Response) => {
+            if (err) {
+              done(err);
+            } else {
+              let series: Series = res.body;
+              console.log(JSON.stringify(series.bar))
+              expect(series.bar).to.deep.equal([
+                [-0.6,0.08333333333333333],
+                [-0.4666666666666667,0.08333333333333333],
+                [-0.3333333333333333,0.08333333333333333],
+                [-0.19999999999999996,0.16666666666666666],
+                [-0.06666666666666665,0.08333333333333333],
+                [0.06666666666666665,0.08333333333333333],
+                [0.20000000000000007,0.16666666666666666],
+                [0.33333333333333337,0.08333333333333333],
+                [0.4666666666666667,0.08333333333333333],
+                [0.6,0.08333333333333333]]
+                );
+              expect(isNaN(series.dist[0][0])).to.be.false;
+              expect(res.status).to.equal(200);
+              done();
+            }
+          });
       })
     });
 
