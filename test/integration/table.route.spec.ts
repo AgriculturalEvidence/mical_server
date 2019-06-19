@@ -131,6 +131,21 @@ describe('table API (with yield API)', () => {
           }
         });
     });
+
+    it('should find bounds', (done) => {
+      supertest(app)
+        .get('/api/table/yield' +
+          '?area=' + '0,-190,' + '10,10')
+        .end((err: any, res: supertest.Response) => {
+          if (err) {
+            done(err);
+          } else {
+            expect(res.status).to.equal(200);
+            expect(res.body.length).equal(4);
+            done();
+          }
+        });
+    });
   });
 
   describe('GET /api/table/intervention/yield', () => {
@@ -230,6 +245,36 @@ describe('table API (with yield API)', () => {
                 [0.33333333333333337,0.08333333333333333],
                 [0.4666666666666667,0.08333333333333333],
                 [0.6,0.08333333333333333]]
+                );
+              expect(isNaN(series.dist[0][0])).to.be.false;
+              expect(res.status).to.equal(200);
+              done();
+            }
+          });
+      });
+
+      it("should add left and right endpoints to dist", (done) => {
+        supertest(app)
+          .get('/api/table/histogram/yield?ticks=4&samplePts=2')
+          .end((err: any, res: supertest.Response) => {
+            if (err) {
+              done(err);
+            } else {
+              let series: Series = res.body;
+              console.log(JSON.stringify(series.dist))
+              expect(series.dist).to.deep.equal(
+                [[-0.7999999999999999,0.2625],
+                [-0.7,0.32250000000000006],
+                [-0.6,0.3843750000000001],
+                [-0.4,0.5087499999999999],
+                [-0.2,0.6137499999999999],
+                [-2.7755575615628914e-17,0.65875],
+                [0.19999999999999996,0.64375],
+                [0.3999999999999999,0.56875],
+                [0.6,0.446875],
+                [0.7999999999999999,0.3225],
+                [0.6,0.446875],
+                [0.5,0.5087499999999999]]
                 );
               expect(isNaN(series.dist[0][0])).to.be.false;
               expect(res.status).to.equal(200);
