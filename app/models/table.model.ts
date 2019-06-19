@@ -3,6 +3,7 @@ import {Yield} from './yield.model';
 import {logger} from '../../utils/logger';
 import {ErrorCode} from '../util/errorcodes.info';
 import {performance} from 'perf_hooks';
+import { createAreaFilter } from '../util/location.util';
 
 let atob = require('atob');
 
@@ -19,9 +20,8 @@ export interface IOutcomeTableDocument extends mongoose.Document, IOutcomeTableR
 }
 
 export interface IOutcomeTableModel<T> {
-  findByCoords(areaPoints: Array<number[]>,
-               filters?: Object,
-               cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>>
+  findRows(filters?: Object,
+            cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>>
   findUnique(col: string): Promise<string[]>
   getAllInterventionTypes(): Promise<number[]>;
 }
@@ -46,9 +46,10 @@ export function getCoordsPolygon(str: string): number[][] {
     return [];
   }
 
-  // todo: AE-45
-  if (points[1] > 180) points[1] = 180;
-  if (points[3] < -180) points[3] = -180;
+  if (points[1] - points[3] > 360) {
+    points[1] = 180;
+    points[3] = -180;
+  }
 
   let corners: number[][] = [];
   corners.push([points[3], points[0]]);
@@ -89,7 +90,7 @@ export function getQueryCols(str: string): {[col: string]: number } {
  * Queries the given table within coords and with a given set of filters. If you
  * need special columns you can specify them inside of the cols param
  * @param tableStr table name
- * @param coords the enclosing polygon oriented ccw
+ * @param coords the enclosing polygon formatted properly (lng, lat)
  * @param filters the filters that will be applied to the given query
  * @param cols extra cols that might be needed
  */
@@ -103,8 +104,12 @@ export async function query(tableStr: string, coords: number[][],
     logger.error("Table name given in request is not valid")
     return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
   }
-  // todo vpineda add the query cols that we want to show
-  let ans = await table.findByCoords(coords, filters, cols);
+  
+  let areaFilter = createAreaFilter(coords);
+
+  let ans = await table.findRows({
+    "$and": [filters, areaFilter] 
+  }, cols);
 
   logger.trace("Query took: " + (performance.now() - startT) + " millis");
   return ans;

@@ -20,9 +20,8 @@ interface IYieldDocument extends mongoose.Document, IOutcomeTableDocument, IYiel
 
 // Model interface
 interface IYieldModel extends mongoose.Model<IYieldDocument>, IOutcomeTableModel<IYieldDocument> {
-  findByCoords(areaPoints: Array<number[]>,
-               filters?: Object,
-               cols?: {[col: string]: number}): Promise<Array<IYieldRow>>;
+  findRows(filters?: Object,
+            cols?: {[col: string]: number}): Promise<Array<IYieldRow>>;
   findByStudy(studyId: string, filters?: Object): Promise<Array<IYieldRow>>;
   findUnique(col: string): Promise<string[]>;
 }
@@ -74,32 +73,9 @@ YieldSchema.statics = {
   * @param {Object} cols? key contains name of the column and value is whether you want it
   * @returns {Promise<Array<IYieldRow>>} Returns a Promise of the datapoints.
   */
-  // todo vpineda figure out which type of queries we want to compute
-  findByCoords(areaPoints: Array<number[]>,
-               filters?: Object,
+  findRows(filters?: Object,
                cols?: {[col: string]: number}): Promise<Array<IYieldRow>> {
-    let q = this.find();
-    if (areaPoints && areaPoints.length > 2) {
-      const polygon = {
-        'type' : 'Polygon',
-        'coordinates' : [areaPoints],
-        crs: {
-          type: "name",
-          properties: { name: "urn:x-mongodb:crs:strictwinding:EPSG:4326" }
-        }
-      };
-      q = q.where('coords').within(polygon);
-    }
-
-    if (filters) {
-      q.where(filters)
-    }
-
-    if (cols) {
-      q.select(cols)
-    }
-
-    let query = q.lean().exec();
+    let query = this.buildQuery(filters, cols).lean().exec();
     return query
       .then((dataPoints: Array<IYieldRow>) => {
         if (dataPoints && dataPoints.length) {
@@ -112,8 +88,21 @@ YieldSchema.statics = {
       });
   },
 
+  buildQuery(filters?: Object, cols?: {[col: string]: number}) {
+    let q = this.find();
+
+    if (filters) {
+      q.where(filters)
+    }
+
+    if (cols) {
+      q.select(cols)
+    }
+    return q;
+  },
+
   findByStudy(studyId: string, filters?: Object): Promise<Array<IYieldRow>> {
-    return this.findByCoords([], {
+    return this.findRows({
       studyID: studyId,
         ...filters
     });

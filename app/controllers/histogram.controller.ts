@@ -183,6 +183,11 @@ async function sampleDistribution(aTicks: number[], rows : IOutcomeTableRow[], s
 }
 
 const CAPTION_STRS = ["AVG", "MEDIAN"];
+class CaptionCalculator {
+  constructor(query: Object) {
+  }
+}
+
 enum CAPTION_OPTS {
   AVG,
   MEADIAN,
@@ -192,7 +197,6 @@ async function processCaption(seriesInfo: Promise<Series>): Promise<string> {
   // todo vpineda
   let {desc} = await seriesInfo;
   let token = desc.split(" ");
-  let reqQueries = CAPTION_STRS.map()
   return "";
 }
 

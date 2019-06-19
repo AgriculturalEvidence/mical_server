@@ -131,6 +131,21 @@ describe('table API (with yield API)', () => {
           }
         });
     });
+
+    it('should find bounds', (done) => {
+      supertest(app)
+        .get('/api/table/yield' +
+          '?area=' + '0,-190,' + '10,10')
+        .end((err: any, res: supertest.Response) => {
+          if (err) {
+            done(err);
+          } else {
+            expect(res.status).to.equal(200);
+            expect(res.body.length).equal(4);
+            done();
+          }
+        });
+    });
   });
 
   describe('GET /api/table/intervention/yield', () => {
