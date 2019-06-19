@@ -5,7 +5,7 @@ import {ServerConstants} from '../util/constants.util';
 const ks = require('kernel-smooth');
 import {ErrorCode, format} from '../util/errorcodes.info';
 import {Series, SeriesEntry} from '../util/typedef.util';
-import {Intervention} from '../models/intervention.model';
+import {Intervention, IInterventionDocument} from '../models/intervention.model';
 
 /**
  * Adds the necessary fields to the given query
@@ -39,14 +39,18 @@ async function buildSeries(ticks: number,
                            docs: IOutcomeTableRow[],
                            interventionKey?: number): Promise<Series> {
   let sMetaPromise = getSeriesMetadata(interventionKey);
+  let sCaptionPromise = processCaption(sMetaPromise);
 
   let [aTicks, nHist] = await group(docs, ticks);
   let distPts = await sampleDistribution(aTicks, docs, samplePts);
 
   let series: Series = await sMetaPromise;
+  
   series.ticks = aTicks;
   series.bar = nHist;
   series.dist = distPts;
+  
+  series.desc = await sCaptionPromise;
   return series;
 }
 
@@ -178,6 +182,20 @@ async function sampleDistribution(aTicks: number[], rows : IOutcomeTableRow[], s
   return <any> kde.points(pts);
 }
 
+const CAPTION_STRS = ["AVG", "MEDIAN"];
+enum CAPTION_OPTS {
+  AVG,
+  MEADIAN,
+}
+
+async function processCaption(seriesInfo: Promise<Series>): Promise<string> {
+  // todo vpineda
+  let {desc} = await seriesInfo;
+  let token = desc.split(" ");
+  let reqQueries = CAPTION_STRS.map()
+  return "";
+}
+
 /**
  * Queries the given intervention and returns its series info
  * @param key intervention table key that we are looking for
@@ -192,6 +210,7 @@ async function getSeriesMetadata(key: number): Promise<Series> {
       },
       title: interventionEntry.title,
       bar: [], dist: [], ticks: [],
+      desc: "",
     }
   } catch (e) {
     return {
@@ -201,6 +220,7 @@ async function getSeriesMetadata(key: number): Promise<Series> {
       },
       title: ServerConstants.DEFAULT_HISTOGRAM_TITLE,
       bar: [], dist: [], ticks: [],
+      desc: "",
     }
   }
 }

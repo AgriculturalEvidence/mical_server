@@ -23,6 +23,7 @@ export interface Series {
   bar: SeriesEntry,
   dist: SeriesEntry,
   ticks: Ticks,
+  desc: string,
   labels: {
     denom: string,
     numerator: string
