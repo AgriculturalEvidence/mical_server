@@ -2,10 +2,9 @@ import { IOutcomeTableRow } from "../models/table.model";
 import { logger } from "../../utils/logger";
 
 export enum AGGREGATION_OPT {
-  AVG, SUM
+  AVG, COUNT
 }
-export const AGGREGATION_STR = ["$avg", "$sum"]
-export const CAPTION_OPT = ["avg", "sum"];
+export const CAPTION_OPT = ["avg", "count"];
 
 export class AggregateCalculator {
   constructor(private opt: AGGREGATION_OPT[]) {}
@@ -42,8 +41,8 @@ export class AggregateCalculator {
       switch(v) {
         case AGGREGATION_OPT.AVG:
           return row.total / row.count;
-        case AGGREGATION_OPT.SUM:
-          return row.total;
+        case AGGREGATION_OPT.COUNT:
+          return row.count;
       }
       return 0;
     })

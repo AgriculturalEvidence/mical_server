@@ -43,7 +43,7 @@ class InterventionParser extends Parser {
     super();
   }
 
-  prepareRows(ws: WorkSheet, colInfo: ColumDesc) : IInterventionDocument[] {
+  prepareRows(ws: WorkSheet, colInfo: ColumDesc) {
     let [_, numRows] = parseRef(ws["!ref"]);
     let rows = [];
 
@@ -60,7 +60,7 @@ class InterventionParser extends Parser {
         if(!validRow(row)) {
           logger.info("Dropping row " + row);
         } else {
-          rows.push(new Intervention(row));
+          rows.push(row);
         }
     }
     return rows;
@@ -75,10 +75,15 @@ class InterventionParser extends Parser {
         return 0;
       }
       let rows = this.prepareRows(ws, cols);
-      return Promise.all(rows.map(function (r) {
-        return r.save();
-      })).then((rows) => rows.length).catch(e => {
-        console.log("error!");
+      return Promise.all(rows.map(function (row) {
+        return new Promise( (a, r) => {
+          Intervention.updateOne({key: row.key}, row, {upsert: true}, (err) => err ? r(err) : a(err));
+        });
+      })).then((rows) => {
+        Intervention.collection.dropIndexes();
+        return rows.length
+      }).catch(e => {
+        console.log("error!" + e.stack);
         return 0;
       });
     } catch (e) {

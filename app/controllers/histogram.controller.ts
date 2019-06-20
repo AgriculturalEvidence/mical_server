@@ -6,7 +6,7 @@ const ks = require('kernel-smooth');
 import {ErrorCode, format} from '../util/errorcodes.info';
 import {Series, SeriesEntry} from '../util/typedef.util';
 import {Intervention, IInterventionDocument} from '../models/intervention.model';
-import { CAPTION_OPT, AggregateCalculator } from '../util/aggregation.util';
+import { CAPTION_OPT, AggregateCalculator, AGGREGATION_OPT } from '../util/aggregation.util';
 
 /**
  * Adds the necessary fields to the given query
@@ -215,9 +215,14 @@ async function processCaption(seriesInfo: Promise<Series>, req : restify.Request
   let calculated = ac.get(aggAns);
 
   tIdxs.forEach((tIdx, idx) => {
-    let addPercent = calculated[idx] < 10 && calculated[idx] > -10
+    let addPercent = reqCapts[idx] == AGGREGATION_OPT.AVG;
     if (addPercent) calculated[idx] *= 100;
     token[tIdx] = calculated[idx].toPrecision(3) + (addPercent ? "%" : "");
+    let possibleAppend = token[tIdx + 1].match(/^%{(.*)}$/);
+    if (possibleAppend != null) {
+      let opts = possibleAppend[1].split("|");
+      token[tIdx + 1] = calculated[idx] > 0 ? opts[1] : opts[0];
+    }
   });
 
   return token.join(" ");

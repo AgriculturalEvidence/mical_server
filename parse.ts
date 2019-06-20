@@ -120,6 +120,7 @@ async function run() {
         break;
       default:
         logger.error("couldn't parse answer ")
+        continue;
     }
 
     console.log("Running parsing operation");

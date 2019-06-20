@@ -81,8 +81,14 @@ const defaultYieldParsingParams = {
     effectSize: "EffectSize",
     sampleSize: "SampleSize",
     studyId: "Study#",
-    interventionType: "intType"
-  }
+    interventionType: "intType",
+    filterCols: {
+      author: "Author",
+      crop: "Crop type",
+      duration: "Duration of study",
+      soil: "Soil pH"
+    }
+  } 
 };
 const defaultInterventionParsingParams = {
   fileName: "intervention.xlsx",
