@@ -13,7 +13,7 @@ function load(req: restify.Request, res: restify.Response, next: restify.Next) {
     Intervention.findByKey.bind(Intervention);
   if (isNaN(k)) {
     // then is a search on key
-    k = req.params.key.toLowerCase();
+    k = req.params.key;
     fn = Intervention.findByStringKey.bind(Intervention);
   }
   fn(k).then((doc) => {
