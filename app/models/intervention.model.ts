@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import {ErrorCode, ErrorInfo} from '../util/errorcodes.info';
+import { ErrorCode } from '../util/errorcodes.info';
 
 const Schema = mongoose.Schema;
 
@@ -96,3 +96,4 @@ const Intervention: IInterventionModel =
   <IInterventionModel>mongoose.model('Intervention', InterventionSchema);
 
 export { Intervention, IInterventionDocument };
+

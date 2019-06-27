@@ -6,9 +6,9 @@ export enum ErrorCode {
   INVALID_NUMBER_OF_TICKS,
   INVALID_NUMBER_OF_SAMPLE_PTS,
 
-  YIELD_NO_INTERVENTION_TYPES,
-  YIELD_NO_INTERVENTION_OF_TYPE,
-  YIELD_NO_DATA_FOR_STUDY
+  NO_INTERVENTION_TYPES,
+  NO_INTERVENTION_OF_TYPE,
+  NO_DATA_FOR_STUDY
 }
 
 export interface ErrorInfo {
@@ -29,20 +29,20 @@ export function format(error: ErrorInfo): {status: number, msg: string} {
         status: 404,
         msg: "Couldn't find key for " + err.i,
       };
-    case ErrorCode.YIELD_NO_INTERVENTION_TYPES:
+    case ErrorCode.NO_INTERVENTION_TYPES:
       return {
         status: 404,
-        msg: "No intervention types for yield"
+        msg: "No intervention types for table " + err.table,
       }
-    case ErrorCode.YIELD_NO_INTERVENTION_OF_TYPE:
+    case ErrorCode.NO_INTERVENTION_OF_TYPE:
       return {
         status: 404,
-        msg: "It seems like yield doesn\'t contain data for " + err.key + " intervention"
+        msg: "It seems like " + err.table + " doesn\'t contain data for " + err.key + " intervention"
       }
-    case ErrorCode.YIELD_NO_DATA_FOR_STUDY:
+    case ErrorCode.NO_DATA_FOR_STUDY:
       return {
         status: 404,
-        msg: "No data in yield table for filters " + JSON.stringify(err.filters),
+        msg: "No data in " + err.table + " table for filters " + JSON.stringify(err.filters),
       }
     case ErrorCode.TABLE_NOT_FOUND:
       return {

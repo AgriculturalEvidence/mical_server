@@ -1,37 +1,120 @@
-import * as mongoose from 'mongoose';
-import {Yield} from './yield.model';
-import {logger} from '../../utils/logger';
-import {ErrorCode} from '../util/errorcodes.info';
-import {performance} from 'perf_hooks';
-import { createAreaFilter } from '../util/location.util';
+import { performance } from 'perf_hooks';
+import { logger } from '../../utils/logger';
 import { AggregateCalculator } from '../util/aggregation.util';
+import { ErrorCode } from '../util/errorcodes.info';
+import { createAreaFilter } from '../util/location.util';
+import { IOutcomeTableDocument, IOutcomeTableModel, IOutcomeTableRow } from '../util/typedef.util';
+import { IInterventionDocument, Intervention } from './intervention.model';
+import { Yield } from './yield.model';
 
 let atob = require('atob');
-
-// Row interface, values of each row without being a full-fledged document,
-// helpful when querying a lot of data
-export interface IOutcomeTableRow {
-  interventionType: number;
-  effectSize: number;
-  sampleSize: number;
-  filterCols: {[key: string]: string};
-}
-
-export interface IOutcomeTableDocument extends mongoose.Document, IOutcomeTableRow {
-}
-
-export interface IOutcomeTableModel<T> {
-  findRows(filters?: Object,
-            cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>>
-  findUnique(col: string): Promise<string[]>
-  getAllInterventionTypes(): Promise<number[]>;
-}
 
 // TODO: vpineda, do this dynamically knowing which type are available
 const TableMap: {[key: string]: IOutcomeTableModel<IOutcomeTableDocument>} = {
   yield: Yield
 };
 
+export async function aggregate(tableStr: string, aggCalculator: AggregateCalculator, 
+  coords: number[][], filters?: Object): Promise<Array<IOutcomeTableRow>> {
+  
+  let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
+  if (!table) {
+    logger.error("Table name given in request is not valid")
+    return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
+  }
+
+  let areaFilter = createAreaFilter(coords);
+  let match = {
+    "$and": [filters, areaFilter] 
+  };
+  
+  return (<any>table).aggregate([
+    { "$match": match },
+    ... aggCalculator.build()
+  ]).exec();
+}
+
+/**
+ * Queries the given table within coords and with a given set of filters. If you
+ * need special columns you can specify them inside of the cols param
+ * @param tableStr table name
+ * @param coords the enclosing polygon formatted properly (lng, lat)
+ * @param filters the filters that will be applied to the given query
+ * @param cols extra cols that might be needed
+ */
+export async function query(tableStr: string, coords: number[][], 
+  filters?: Object, cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>> {
+
+  let startT = performance.now();
+
+  let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
+  if (!table) {
+    logger.error("Table name given in request is not valid")
+    return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
+  }
+  
+  let areaFilter = createAreaFilter(coords);
+  let ans = await table.executeQuery({
+    "$and": [filters, areaFilter] 
+  }, cols);
+
+  logger.trace("Query took: " + (performance.now() - startT) + " millis");
+  
+  if (ans && ans.length) {
+    return ans;
+  }
+  return Promise.reject({
+    code: ErrorCode.NO_DATA_FOR_STUDY,
+    filters: filters,
+    table: tableStr
+  });
+}
+
+/**
+ * Queries the given table for unique names in the given column
+ * @param tableStr table name
+ * @param col name of the given column
+ */
+export async function unique(tableStr: string, col: string): Promise<string[]> {
+
+  let startT = performance.now();
+
+  let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
+  if (!table) {
+    logger.error("Table name given in request is not valid")
+    return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
+  }
+  let ans = await table.executeDistinct(col);
+
+  logger.trace("Query took: " + (performance.now() - startT) + " millis");
+  
+  if (ans && ans.length) return ans;
+  return Promise.reject({
+    code: ErrorCode.NO_UNIQUE_VALUES,
+    col: col,
+    table: tableStr
+  });
+}
+
+export async function interventions(tableStr: string): Promise<IInterventionDocument[]> {
+  let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
+  if (!table) {
+    logger.error("Table name given in request is not valid")
+    return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
+  }
+  const intPromise = await table.getAllInterventionTypes();
+  if (!intPromise || intPromise.length == 0) {
+    return Promise.reject({
+      code: ErrorCode.NO_INTERVENTION_TYPES,
+      table: tableStr
+    });
+  }
+  return Promise.all(intPromise.map((iKey) => Intervention.findByKey(iKey)));
+}
+
+export function getTables() {
+  return TableMap;
+}
 
 /**
  * Gets array of points as [lng, lat]
@@ -85,77 +168,4 @@ export function getQueryCols(str: string): {[col: string]: number } {
   let obj: {[col: string]: number } = {_id: 0};
   col.forEach(v => obj[v] = 1);
   return obj;
-}
-
-export async function aggregate(tableStr: string, aggCalculator: AggregateCalculator, 
-  coords: number[][], filters?: Object): Promise<Array<IOutcomeTableRow>> {
-  
-  let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
-  if (!table) {
-    logger.error("Table name given in request is not valid")
-    return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
-  }
-
-  let areaFilter = createAreaFilter(coords);
-  let match = {
-    "$and": [filters, areaFilter] 
-  };
-  
-  return (<any>table).aggregate([
-    { "$match": match },
-    ... aggCalculator.build()
-  ]).exec();
-}
-
-/**
- * Queries the given table within coords and with a given set of filters. If you
- * need special columns you can specify them inside of the cols param
- * @param tableStr table name
- * @param coords the enclosing polygon formatted properly (lng, lat)
- * @param filters the filters that will be applied to the given query
- * @param cols extra cols that might be needed
- */
-export async function query(tableStr: string, coords: number[][], 
-  filters?: Object, cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>> {
-
-  let startT = performance.now();
-
-  let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
-  if (!table) {
-    logger.error("Table name given in request is not valid")
-    return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
-  }
-  
-  let areaFilter = createAreaFilter(coords);
-  let ans = await table.findRows({
-    "$and": [filters, areaFilter] 
-  }, cols);
-
-  logger.trace("Query took: " + (performance.now() - startT) + " millis");
-  return ans;
-}
-
-/**
- * Queries the given table for unique names in the given column
- * @param tableStr table name
- * @param col name of the given column
- */
-export async function unique(tableStr: string, col: string): Promise<string[]> {
-
-  let startT = performance.now();
-
-  let table: IOutcomeTableModel<IOutcomeTableDocument> = TableMap[tableStr];
-  if (!table) {
-    logger.error("Table name given in request is not valid")
-    return Promise.reject({code: ErrorCode.TABLE_NOT_FOUND, table: tableStr});
-  }
-  // todo vpineda add the query cols that we want to show
-  let ans = await table.findUnique(col);
-
-  logger.trace("Query took: " + (performance.now() - startT) + " millis");
-  return ans;
-}
-
-export function getTables() {
-  return TableMap;
 }

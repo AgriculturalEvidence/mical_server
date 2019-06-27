@@ -1,10 +1,10 @@
-import {IStudyDocument} from '../models/studies.model';
-import {IYieldDocument, IYieldRow, Yield} from '../models/yield.model';
-import {ColumDesc, ParseJob, Parser} from './paper.parser';
-import {WorkBook, WorkSheet} from 'xlsx';
-import {parseRef} from '../util/excel.helpers.util';
-import {Intervention} from '../models/intervention.model';
-import {logger} from '../../utils/logger';
+import { WorkBook, WorkSheet } from 'xlsx';
+import { logger } from '../../utils/logger';
+import { Intervention } from '../models/intervention.model';
+import { IStudyDocument } from '../models/studies.model';
+import { IYieldRow, Yield } from '../models/yield.model';
+import { parseRef } from '../util/excel.helpers.util';
+import { ColumDesc, ParseJob, Parser } from './paper.parser';
 
 const XLSX = require('xlsx');
 
@@ -16,7 +16,6 @@ interface YieldJob extends ParseJob {
     yCoords: string,
     effectSize: string,
     sampleSize: string,
-    studyId: string,
     interventionType: string,
     filterCols: {
       [key: string]: string,
@@ -81,13 +80,11 @@ class YieldParser extends Parser {
         let y = ws[colInfo.yCoords + rowIdx];
         let effS = ws[colInfo.effectSize + rowIdx];
         let samS = ws[colInfo.sampleSize + rowIdx];
-        let studID = ws[colInfo.studyId + rowIdx];
 
         if (!x) logger.info(`Dropping row ${rowIdx} due to x`);
         if (!y) logger.info(`Dropping row ${rowIdx} due to y`);
         if (!effS) logger.info(`Dropping row ${rowIdx} due to effs`);
         if (!samS) logger.info(`Dropping row ${rowIdx} due to sams`);
-        if (!studID) logger.info(`Dropping row ${rowIdx} due to studyid`);
 
         // parse filter cols
         let filterObj: {[key: string]: string} = {};
@@ -104,7 +101,7 @@ class YieldParser extends Parser {
           },
           effectSize: effS.v,
           sampleSize: samS.v,
-          studyID: this.yieldJob.studyDef.id + "_" + studID.v,
+          importID: this.yieldJob.studyDef.id,
           interventionType: interventionRow.key,
           filterCols: filterObj,
         };
@@ -150,4 +147,5 @@ class YieldParser extends Parser {
   }
 }
 
-export {YieldJob, YieldParser};
+export { YieldJob, YieldParser };
+

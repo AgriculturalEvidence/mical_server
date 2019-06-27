@@ -21,7 +21,6 @@ let parseOpts = {
             "yCoords": "Y-coord deg",
             "effectSize": "Yield ic 1",
             "sampleSize": "N sc 1",
-            "studyId": "Study#",
             "interventionType": "intType",
             "filterCols": {
               "author": "Author",
@@ -93,34 +92,34 @@ describe("yield parsing integration test", function() {
     })
 
     it("creates all of the rows", async () => {
-        let yp = new YieldParser(parseOpts);
-        let wb: WorkBook = XLSX.readFile(parseOpts.fileName);
-        let columMP = {
-            "xCoords": "T",
-            "yCoords": "V",
-            "effectSize": "BK",
-            "sampleSize": "BE",
-            "studyId": "A",
-            "interventionType": "BY",
-        }
-        let ans = await yp.prepareRows(wb.Sheets[wb.SheetNames[0]], columMP);
-        expect(ans.length).eq(746)
+      let yp = new YieldParser(parseOpts);
+      let wb: WorkBook = XLSX.readFile(parseOpts.fileName);
+      let columMP = {
+          "xCoords": "T",
+          "yCoords": "V",
+          "effectSize": "BK",
+          "sampleSize": "BE",
+          "studyId": "A",
+          "interventionType": "BY",
+      }
+      let ans = await yp.prepareRows(wb.Sheets[wb.SheetNames[0]], columMP);
+      expect(ans.length).eq(746)
 
-        expect(ans[0].effectSize).eq(340.09)
+      expect(ans[0].effectSize).eq(340.09)
     })
 
     it ("inserts all rows" , (done) => {
-        let yp = new YieldParser(parseOpts);
-        function validation() {
-            Yield.findByStudy(parseOpts.studyDef.id + "_1").then((values) => {
-                expect(values.length).to.be.eq(8);
-                return Yield.getAllInterventionTypes()
-            }, (err) => done(err)).then((types) => {
-                expect(types).to.deep.eq([1]);
-                done();
-            }, (err) => done(err));
-        }
-        yp.run().then(validation, (err) => done("Coudn't add rows! " + err))
+      let yp = new YieldParser(parseOpts);
+      function validation() {
+          Yield.executeQuery().then((values) => {
+              expect(values.length).to.be.eq(746);
+              return Yield.getAllInterventionTypes()
+          }, (err) => done(err)).then((types) => {
+              expect(types).to.deep.eq([1]);
+              done();
+          }, (err) => done(err));
+      }
+      yp.run().then(validation, (err) => done("Coudn't add rows! " + err))
     });
 
     it ("works with csv files", function (done) {
@@ -153,8 +152,8 @@ describe("yield parsing integration test", function() {
 
       let yp = new YieldParser(parseOpts);
       function validation() {
-        Yield.findByStudy("13_1").then((values) => {
-          expect(values.length).to.be.eq(2);
+        Yield.executeQuery({sampleSize: 3}).then((values) => {
+          expect(values.length).to.be.eq(657);
           done();
         }, (err) => done(err));
       }

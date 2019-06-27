@@ -1,12 +1,12 @@
 import * as restify from 'restify';
-import {logger} from '../../utils/logger';
-import {IOutcomeTableDocument, IOutcomeTableRow, aggregate, getCoordsPolygon, getQueryFilters} from '../models/table.model';
-import {ServerConstants} from '../util/constants.util';
+import { logger } from '../../utils/logger';
+import { Intervention } from '../models/intervention.model';
+import { aggregate, getCoordsPolygon, getQueryFilters } from '../models/table.model';
+import { AggregateCalculator, AGGREGATION_OPT, CAPTION_OPT } from '../util/aggregation.util';
+import { ServerConstants } from '../util/constants.util';
+import { ErrorCode, format } from '../util/errorcodes.info';
+import { IOutcomeTableRow, Series, SeriesEntry } from '../util/typedef.util';
 const ks = require('kernel-smooth');
-import {ErrorCode, format} from '../util/errorcodes.info';
-import {Series, SeriesEntry} from '../util/typedef.util';
-import {Intervention, IInterventionDocument} from '../models/intervention.model';
-import { CAPTION_OPT, AggregateCalculator, AGGREGATION_OPT } from '../util/aggregation.util';
 
 /**
  * Adds the necessary fields to the given query
@@ -260,4 +260,5 @@ async function getSeriesMetadata(key: number): Promise<Series> {
 }
 
 
-export { prepare, build }
+export { prepare, build };
+

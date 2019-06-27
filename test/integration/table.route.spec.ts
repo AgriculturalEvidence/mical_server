@@ -13,7 +13,7 @@ const yieldEntry = {
   coords: new GeoPoint([1.5, 3.5]),
   effectSize: 3,
   sampleSize: 20,
-  studyID: '11ADAFF',
+  importID: '11ADAFF',
   interventionType: 1,
 };
 
@@ -91,7 +91,7 @@ describe('table API (with yield API)', () => {
             done(err);
           } else {
             expect(res.body[0].effectSize).to.equal(yieldEntry.effectSize);
-            expect(res.body[0].studyID).to.equal(yieldEntry.studyID);
+            expect(res.body[0].importID).to.equal(yieldEntry.importID);
             expect(res.body[0].sampleSize).to.equal(yieldEntry.sampleSize);
             expect(res.body[0].coords).to.not.be.undefined;
             expect(res.status).to.equal(200);

@@ -2,11 +2,11 @@ import {YieldParser} from './app/parsers/yield.parser';
 import * as readline from 'readline';
 import {EffectSizeScale, Study} from './app/models/studies.model';
 import {parsingConfig} from './config/env';
-import {YieldType} from './app/models/yield.model';
 import { Parser } from './app/parsers/paper.parser';
 import {InterventionParser} from './app/parsers/intervention.parser';
 import * as serverBoot from './server';
 import {logger} from './utils/logger';
+import * as fYield from './app/models/yield.model';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -47,7 +47,7 @@ async function askStudy(studyType: string) {
 }
 
 async function parseYield(): Promise<Parser> {
-  let study = await askStudy(YieldType);
+  let study = await askStudy(fYield.TableName);
   let defaultSettings = parsingConfig.yieldParams;
 
   let parseYieldParams: any = {

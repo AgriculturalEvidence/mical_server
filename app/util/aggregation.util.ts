@@ -1,4 +1,3 @@
-import { IOutcomeTableRow } from "../models/table.model";
 import { logger } from "../../utils/logger";
 
 export enum AGGREGATION_OPT {
