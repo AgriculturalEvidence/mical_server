@@ -1,7 +1,7 @@
 import * as restify from 'restify';
+import { logger } from '../../utils/logger';
 import { IInterventionDocument, Intervention } from '../models/intervention.model';
-import {logger} from '../../utils/logger';
-import {format} from '../util/errorcodes.info';
+import { format } from '../util/errorcodes.info';
 
 /**
  * Search for a Intervention by id, and append it to req.params if successful.
@@ -101,3 +101,4 @@ function remove(req: restify.Request, res: restify.Response, next: restify.Next)
 }
 
 export { get, create, remove, load, loadAll };
+

@@ -6,7 +6,6 @@ import { AggregateCalculator, AGGREGATION_OPT, CAPTION_OPT } from '../util/aggre
 import { ServerConstants } from '../util/constants.util';
 import { ErrorCode, format } from '../util/errorcodes.info';
 import { IOutcomeTableRow, Series, SeriesEntry } from '../util/typedef.util';
-const ks = require('kernel-smooth');
 
 /**
  * Adds the necessary fields to the given query

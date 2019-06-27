@@ -1,8 +1,6 @@
-import { WorkBook, WorkSheet } from 'xlsx';
-import { logger } from '../../utils/logger';
+import { WorkSheet } from 'xlsx';
 import { Intervention } from '../models/intervention.model';
-import { parseRef } from '../util/excel.helpers.util';
-import { ColumDesc, ParseJob, Parser } from './paper.parser';
+import { ColumDesc, Parser } from './paper.parser';
 
 const XLSX = require('xlsx');
 

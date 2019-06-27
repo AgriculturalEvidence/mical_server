@@ -73,3 +73,4 @@ StudySchema.statics = {
 const Study: IStudyModel = <IStudyModel>mongoose.model('Study', StudySchema);
 
 export { Study, IStudyDocument, EffectSizeScale };
+

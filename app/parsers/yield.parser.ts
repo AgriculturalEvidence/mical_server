@@ -1,12 +1,5 @@
-import { WorkBook, WorkSheet } from 'xlsx';
-import { logger } from '../../utils/logger';
-import { Intervention } from '../models/intervention.model';
-import { IStudyDocument } from '../models/studies.model';
-import { IYieldRow, Yield } from '../models/yield.model';
-import { parseRef } from '../util/excel.helpers.util';
-import { ColumDesc, ParseJob, Parser, PaperParser } from './paper.parser';
-
-const XLSX = require('xlsx');
+import { Yield } from '../models/yield.model';
+import { PaperParser } from './paper.parser';
 
 interface YieldJob {
   importID: string;

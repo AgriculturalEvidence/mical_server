@@ -1,6 +1,6 @@
 import * as restify from 'restify';
 import { IStudyDocument, Study } from '../models/studies.model';
-import {format} from '../util/errorcodes.info';
+import { format } from '../util/errorcodes.info';
 
 /**
  * Search for studies of a given type
@@ -73,3 +73,4 @@ function remove(req: restify.Request, res: restify.Response, next: restify.Next)
 }
 
 export { get, create, remove, load };
+

@@ -1,10 +1,8 @@
 import * as restify from 'restify';
 import { logger } from '../../utils/logger';
-import { IInterventionDocument, Intervention } from '../models/intervention.model';
 import * as Table from '../models/table.model';
 import { getCoordsPolygon, getQueryCols, getQueryFilters } from '../models/table.model';
 import { format } from '../util/errorcodes.info';
-import { IOutcomeTableDocument, IOutcomeTableModel } from '../util/typedef.util';
 
 /**
  * Search get all tables
