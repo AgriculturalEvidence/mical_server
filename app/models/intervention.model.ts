@@ -3,8 +3,7 @@ import { ErrorCode } from '../util/errorcodes.info';
 
 const Schema = mongoose.Schema;
 
-// Document interface
-interface IInterventionDocument extends mongoose.Document {
+interface IInterventionRow {
   key: number;
   sKey: string;
   title: string;
@@ -12,6 +11,9 @@ interface IInterventionDocument extends mongoose.Document {
   denom: string;
   numerator: string;
 }
+
+// Document interface
+interface IInterventionDocument extends mongoose.Document, IInterventionRow{}
 
 // Model interface
 interface IInterventionModel extends mongoose.Model<IInterventionDocument> {
@@ -95,5 +97,5 @@ InterventionSchema.statics = {
 const Intervention: IInterventionModel =
   <IInterventionModel>mongoose.model('Intervention', InterventionSchema);
 
-export { Intervention, IInterventionDocument };
+export { Intervention, IInterventionDocument, IInterventionRow };
 

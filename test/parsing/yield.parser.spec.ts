@@ -4,7 +4,7 @@ import * as mongoose from 'mongoose';
 import {app} from '../../server';
 import {logger} from '../../utils/logger';
 import {Study} from '../../app/models/studies.model';
-import {YieldParser} from '../../app/parsers/yield.parser';
+import {YieldParser, YieldJob} from '../../app/parsers/yield.parser';
 import {equal} from 'assert';
 import {WorkBook} from 'xlsx/types';
 import {Yield} from '../../app/models/yield.model';
@@ -13,7 +13,7 @@ import * as serverBoot from '../../server';
 
 const XLSX = require('xlsx');
 
-let parseOpts = {
+let parseOpts: YieldJob = {
     "studyDef": new Study(),
     "fileName": "./test/parsing/data/TND.xlsx",
     "columnMapping": {
@@ -79,7 +79,6 @@ describe("yield parsing integration test", function() {
               "yCoords": "Y-coord deg",
               "effectSize": "Yield ic 1",
               "sampleSize": "N sc 1",
-              "studyId": "Study#",
               "interventionType": "intType",
             });
             equal(f, true, "should find all columns");
@@ -99,7 +98,6 @@ describe("yield parsing integration test", function() {
           "yCoords": "V",
           "effectSize": "BK",
           "sampleSize": "BE",
-          "studyId": "A",
           "interventionType": "BY",
       }
       let ans = await yp.prepareRows(wb.Sheets[wb.SheetNames[0]], columMP);
@@ -131,7 +129,6 @@ describe("yield parsing integration test", function() {
           "yCoords": "Y_coord",
           "effectSize": "log ratio",
           "sampleSize": "sampleSize",
-          "studyId": "Study#",
           "interventionType": "intType",
           "filterCols": {
             "crop": "Crop type",
@@ -154,6 +151,10 @@ describe("yield parsing integration test", function() {
       function validation() {
         Yield.executeQuery({sampleSize: 3}).then((values) => {
           expect(values.length).to.be.eq(657);
+          return Yield.executeQuery({"filterCols.crop": "vegetables"})
+        }).then((rows) => {
+          expect(rows.length).to.be.eq(140);
+          expect(rows[0].filterCols).to.contain.all.keys(["crop", "soil", "duration"]);
           done();
         }, (err) => done(err));
       }

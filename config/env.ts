@@ -80,7 +80,6 @@ const defaultYieldParsingParams = {
     yCoords: "y",
     effectSize: "EffectSize",
     sampleSize: "SampleSize",
-    studyId: "Study#",
     interventionType: "intType",
     filterCols: {
       author: "Author",

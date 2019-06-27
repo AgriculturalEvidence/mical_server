@@ -14,6 +14,8 @@ export class GeoPoint implements Point {
 // Row interface, values of each row without being a full-fledged document,
 // helpful when querying a lot of data
 export interface IOutcomeTableRow {
+  coords: GeoPoint;
+  importID: string;
   interventionType: number;
   effectSize: number;
   sampleSize: number;

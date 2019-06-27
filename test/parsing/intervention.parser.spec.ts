@@ -1,18 +1,24 @@
+import { equal } from 'assert';
+import { expect } from 'chai';
 import 'mocha';
-import {expect} from 'chai';
-import {logger} from '../../utils/logger';
-import {equal} from 'assert';
-import {WorkBook} from 'xlsx/types';
-import {Intervention} from '../../app/models/intervention.model';
-import {parsingConfig} from '../../config/env';
-import {InterventionParser} from '../../app/parsers/intervention.parser';
-import * as serverBoot from "../../server"
+import { WorkBook } from 'xlsx/types';
+import { IInterventionRow, Intervention } from '../../app/models/intervention.model';
+import { InterventionParser } from '../../app/parsers/intervention.parser';
+import * as serverBoot from "../../server";
+import { logger } from '../../utils/logger';
 
 const XLSX = require('xlsx');
 
 describe("Intervention", () => {
   let parseOpts = {
-    ... parsingConfig.interventionParams,
+    columnMapping: {
+      key: "key",
+      sKey: "sKey",
+      title: "title",
+      desc: "desc",
+      denom: "denom",
+      numerator: "numerator"
+    },
     "fileName": "./test/parsing/data/intervention.csv",
   };
 
@@ -55,7 +61,7 @@ describe("Intervention", () => {
         denom: "E",
         numerator: "F",
       };
-      let ans = await int.prepareRows(wb.Sheets[wb.SheetNames[0]], columMP);
+      let ans: IInterventionRow[] = await int.prepareRows(wb.Sheets[wb.SheetNames[0]], columMP);
       expect(ans.length).eq(5);
 
       expect(ans[0].key).eq(1)
