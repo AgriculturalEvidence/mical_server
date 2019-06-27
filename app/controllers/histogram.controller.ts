@@ -218,7 +218,7 @@ async function processCaption(seriesInfo: Promise<Series>, req : restify.Request
     let addPercent = reqCapts[idx] == AGGREGATION_OPT.AVG;
     if (addPercent) calculated[idx] *= 100;
     token[tIdx] = calculated[idx].toPrecision(3) + (addPercent ? "%" : "");
-    let possibleAppend = token[tIdx + 1].match(/^%{(.*)}$/);
+    let possibleAppend = (tIdx + 1 < token.length) ? token[tIdx + 1].match(/^%{(.*)}$/): null;
     if (possibleAppend != null) {
       let opts = possibleAppend[1].split("|");
       token[tIdx + 1] = calculated[idx] > 0 ? opts[1] : opts[0];

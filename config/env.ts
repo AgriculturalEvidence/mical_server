@@ -1,4 +1,6 @@
 import * as path from 'path';
+import { YieldJob } from '../app/parsers/yield.parser';
+import { InterventionJob } from '../app/parsers/intervention.parser';
 
 interface ConfigSettings {
   root: string;
@@ -73,7 +75,8 @@ if ( process.env.DB_PASS ) {
 
 console.log(JSON.stringify(config, null, '\t'));
 
-const defaultYieldParsingParams = {
+const defaultYieldParsingParams: YieldJob = {
+  importID: "1",
   fileName: "yield.xlsx",
   columnMapping: {
     xCoords: "x",
@@ -89,7 +92,7 @@ const defaultYieldParsingParams = {
     }
   } 
 };
-const defaultInterventionParsingParams = {
+const defaultInterventionParsingParams: InterventionJob = {
   fileName: "intervention.xlsx",
   columnMapping: {
     key: "key",
@@ -102,8 +105,8 @@ const defaultInterventionParsingParams = {
 };
 
 const parsingConfig = {
-  yieldParams: defaultYieldParsingParams,
-  interventionParams: defaultInterventionParsingParams
+  yield: defaultYieldParsingParams,
+  intervention: defaultInterventionParsingParams
 };
 
 export { config, parsingConfig };

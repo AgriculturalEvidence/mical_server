@@ -9,11 +9,25 @@ import { Yield } from './yield.model';
 
 let atob = require('atob');
 
-// TODO: vpineda, do this dynamically knowing which type are available
+// --------------------------------------------------------------
+// !!!!!!!!!!!!!!!!  CHANGE TABLE DEFNTIONS HERE !!!!!!!!!!!!!!!!!
+// Add your new table definitions to this object, the key should match
+// whatever request is comming in from the front-end and the object in
+// parse.ts.
+// --------------------------------------------------------------
 const TableMap: {[key: string]: IOutcomeTableModel<IOutcomeTableDocument>} = {
   yield: Yield
 };
 
+
+/**
+ * Queries the given table within coords and with a given set of filters. It aggregates
+ * data accoring to the aggCalculator. A single row will be returned.
+ * @param tableStr table name
+ * @param coords the enclosing polygon formatted properly (lng, lat)
+ * @param filters the filters that will be applied to the given query
+ * @param aggCalculator helper with enough information to build the aggreate string
+ */
 export async function aggregate(tableStr: string, aggCalculator: AggregateCalculator, 
   coords: number[][], filters?: Object): Promise<Array<IOutcomeTableRow>> {
   

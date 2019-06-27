@@ -19,24 +19,6 @@ interface InterventionJob {
   };
 }
 
-function validRow(newData: any) {
-  if (newData === null) {
-    return false;
-  }
-  if (isNaN(newData.key) ||  typeof newData.key !== 'number') {
-    return false;
-  }
-  if (typeof newData.sKey !== 'string') {
-    return false;
-  }
-
-  if (typeof newData.title !== 'string') {
-    return false;
-  }
-
-  return typeof newData.denom === 'string' && typeof newData.numerator === 'string';
-}
-
 class InterventionParser extends Parser {
 
   constructor(public interventionJob: InterventionJob) {
@@ -58,6 +40,24 @@ class InterventionParser extends Parser {
       denom: ws[colInfo.denom + rowIdx].v,
       numerator: ws[colInfo.numerator + rowIdx].v,
     };
+  }
+
+  validRow(newData: any) {
+    if (newData === null) {
+      return false;
+    }
+    if (isNaN(newData.key) ||  typeof newData.key !== 'number') {
+      return false;
+    }
+    if (typeof newData.sKey !== 'string') {
+      return false;
+    }
+  
+    if (typeof newData.title !== 'string') {
+      return false;
+    }
+  
+    return typeof newData.denom === 'string' && typeof newData.numerator === 'string';
   }
 }
 

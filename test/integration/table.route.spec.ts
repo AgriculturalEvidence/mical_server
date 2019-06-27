@@ -21,7 +21,7 @@ const interventionEntry = {
   key: 1,
   sKey: "organic",
   title: "Orgainc Effect Size",
-  desc: "How much does orgainc increase intervention",
+  desc: "${avg} %{less|more} ${count}",
   denom: "Lower interventions",
   numerator: "Higher interventions",
 };
@@ -148,6 +148,24 @@ describe('table API (with yield API)', () => {
     });
   });
 
+
+  describe('GET /api/table/yield/:col', () => {
+    it('should get unique values', (done) => {
+      supertest(app)
+        .get('/api/table/yield/importID' +
+          '?area=' + '0,0,' + '10,10')
+        .end((err: any, res: supertest.Response) => {
+          if (err) {
+            done(err);
+          } else {
+            expect(res.status).to.equal(200);
+            expect(res.body.length).equal(1);
+            done();
+          }
+        });
+    });
+  });
+
   describe('GET /api/table/intervention/yield', () => {
     it('should get valid intervention types in table', (done) => {
       supertest(app)
@@ -204,7 +222,21 @@ describe('table API (with yield API)', () => {
               [ 4, 0 ] 
             ]);
             expect(isNaN(series.dist[0][0])).to.be.false;
-            expect
+            expect(res.status).to.equal(200);
+            done();
+          }
+        });
+    });
+
+    it("should calcualate caption correctly", (done) => {
+      supertest(app)
+        .get('/api/table/histogram/yield?ticks=10&samplePts=1&int=1')
+        .end((err: any, res: supertest.Response) => {
+          if (err) {
+            done(err);
+          } else {
+            let series: Series = res.body;
+            expect(series.desc).to.eq("300% more 240");
             expect(res.status).to.equal(200);
             done();
           }
@@ -310,7 +342,6 @@ describe('table API (with yield API)', () => {
             } else {
               let series: Series = res.body;
               expect(isNaN(series.dist[0][0])).to.be.false;
-              expect
               expect(res.status).to.equal(200);
               done();
             }

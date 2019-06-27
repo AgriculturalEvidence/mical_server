@@ -9,7 +9,7 @@ import { ColumDesc, ParseJob, Parser, PaperParser } from './paper.parser';
 const XLSX = require('xlsx');
 
 interface YieldJob {
-  studyDef: IStudyDocument;
+  importID: string;
   fileName: string;
   columnMapping: {
     xCoords: string,
@@ -38,10 +38,8 @@ class YieldParser extends PaperParser {
   get filterCols() {return this.yieldJob.columnMapping.filterCols};
   // todo vpineda
   get infoCols() {return {}};
+  get importID() { return this.yieldJob.importID }
 
-
-  // todo vpineda
-  get importID() { return "yield";}
   get model() { return Yield};
 }
 

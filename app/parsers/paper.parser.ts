@@ -1,9 +1,9 @@
-import * as mongoose from 'mongoose'
-import { WorkBook, WorkSheet} from 'xlsx';
-import { indexToColumn, parseRef } from '../util/excel.helpers.util';
+import * as mongoose from 'mongoose';
+import { WorkBook, WorkSheet } from 'xlsx';
 import { logger } from '../../utils/logger';
-import { IOutcomeTableDocument, IOutcomeTableRow } from '../util/typedef.util';
 import { Intervention } from '../models/intervention.model';
+import { indexToColumn, parseRef } from '../util/excel.helpers.util';
+import { IOutcomeTableRow } from '../util/typedef.util';
 const XLSX = require('xlsx');
 
 interface ParseJob {
@@ -25,6 +25,7 @@ abstract class Parser {
   abstract get model(): mongoose.Model<mongoose.Document>
 
   abstract async prepareRow(ws: WorkSheet, colInfo: ColumDesc, rowIdx: number): Promise<Object>;
+  abstract validRow(r: Object): boolean;
 
   async run(): Promise<number> {
     try {
@@ -37,6 +38,7 @@ abstract class Parser {
         return 0;
       }
       let rows = await this.prepareRows(ws, cols);
+      if (!rows.length) return 0;
       return new Promise((resolve, reject) => {
         this.model.collection.insertMany(rows, (error, result) => {
           if (error) reject(error);
@@ -46,7 +48,7 @@ abstract class Parser {
         return ans.insertedCount;
       });
     } catch (e) {
-      console.log(e.stack);
+      logger.error(e.stack);
       return Promise.reject("Error handling file: " + JSON.stringify(e));
     }
   }
@@ -86,7 +88,7 @@ abstract class Parser {
       rowPromises.push(newRowPromise);
     }
     return Promise.all(rowPromises).then((rows) => {
-      return rows.filter(v => v !== null);
+      return rows.filter(v => v !== null && this.validRow(v));
     });
   }
 }
@@ -147,12 +149,6 @@ abstract class PaperParser extends Parser {
     };
   }
 
-  prepareRows(ws: WorkSheet, colInfo: ColumDesc) : Promise<any[]> {
-    return super.prepareRows(ws, colInfo).then((rows) => {
-      return rows.filter(v => validRow(v));
-    });
-  }
-
   private getColObj(colDesc: {[col: string]: string}, 
     ws: WorkSheet, 
     colInfo: ColumDesc, 
@@ -174,6 +170,26 @@ abstract class PaperParser extends Parser {
     }
     return Intervention.findByStringKey(sKey.v)
   }
+
+  validRow(newData: any) {
+    if (newData === null) {
+      return false;
+    }
+    if (!newData.coords.coordinates.every(
+      (v: any) => typeof v == 'number')) {
+      logger.info("Dropping: " + JSON.stringify(newData));
+      return false;
+    }
+    if (typeof newData.effectSize !== 'number') {
+      return false;
+    }
+  
+    if (typeof newData.interventionType !== 'number') {
+      return false;
+    }
+  
+    return typeof newData.sampleSize === 'number';
+  }
 }
 
 function invertKeyValue(obj: {[idx: string]: string}) : {[idx: string]: string} {
@@ -181,26 +197,6 @@ function invertKeyValue(obj: {[idx: string]: string}) : {[idx: string]: string} 
     acc[obj[key]] = key;
     return acc;
   }, {});
-}
-
-function validRow(newData: any) {
-  if (newData === null) {
-    return false;
-  }
-  if (!newData.coords.coordinates.every(
-    (v: any) => typeof v == 'number')) {
-    logger.info("Dropping: " + JSON.stringify(newData));
-    return false;
-  }
-  if (typeof newData.effectSize !== 'number') {
-    return false;
-  }
-
-  if (typeof newData.interventionType !== 'number') {
-    return false;
-  }
-
-  return typeof newData.sampleSize === 'number';
 }
 
 type F = {
@@ -219,4 +215,5 @@ function flatten(obj: F, acc: {[key: string]: string} = {}) {
 }
 
 
-export {Parser, PaperParser, ParseJob, ColumDesc}
+export { Parser, PaperParser, ParseJob, ColumDesc };
+

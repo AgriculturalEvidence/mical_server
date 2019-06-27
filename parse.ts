@@ -1,64 +1,89 @@
-import {YieldParser} from './app/parsers/yield.parser';
 import * as readline from 'readline';
-import {EffectSizeScale, Study} from './app/models/studies.model';
-import {parsingConfig} from './config/env';
+import * as Table from './app/models/table.model'
+import { InterventionParser } from './app/parsers/intervention.parser';
 import { Parser } from './app/parsers/paper.parser';
-import {InterventionParser} from './app/parsers/intervention.parser';
+import { YieldJob, YieldParser } from './app/parsers/yield.parser';
+import { parsingConfig } from './config/env';
 import * as serverBoot from './server';
-import {logger} from './utils/logger';
-import * as fYield from './app/models/yield.model';
+import { logger } from './utils/logger';
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
+// --------------------------------------------------------------
+// !!!!!!!!!!!!!!!!  CHANGE TABLE PARSERS HERE !!!!!!!!!!!!!!!!!
+// Add your new parser here once you've added the right model
+// to the table.model file. Note that the name must match otherwise
+// the program will not be able to know which parser to use!
+// --------------------------------------------------------------
+const PaperParsers: {[table: string]: any} = {
+  yield: YieldParser,
+}
+
+
+// -----------------------------------------------
+// Main driver function of parsing operation
+// -----------------------------------------------
+async function run() {
+  while (true) {
+    // Ask what type of parser we would like to execute
+    console.log(`Options are: ${Object.keys(Table.getTables()).join("\n")}`)
+    let ans = await ask("What type of dataset? [yield, ...] ");
+    let parser: Parser;
+
+    if (Object.keys(Table.getTables()).indexOf(ans) !== -1) {
+      parser = await parsePaper(ans);
+    } else if (ans == "intervention") {
+      parser = await parseIntervention();
+    } else {
+      logger.error("couldn't parse answer ")
+        continue;
+    }
+
+    logger.info("Running parsing operation");
+    await parser.run().then((insertedRows) => {
+      logger.info(insertedRows + " rows were inserted")
+    }).catch(err => logger.error(err));
+
+  }
+}
+
 async function ask(question: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     rl.question(question, a => resolve(a))
-  })
-}
-
-async function askStudy(studyType: string) {
-  let studyId = await ask("Study id: ");
-  let studyName = await ask("Study name: ");
-  let effectScale = await ask("Effect Size Scale [L, D]: ");
-
-  let effectScaleEnum: EffectSizeScale = EffectSizeScale.LOG;
-  switch (effectScale) {
-    case 'D': case 'd':
-      console.log("Setting effect size to division scale");
-      break;
-    default:
-      console.log("Setting effect size to log scale");
-      break;
-  }
-  let contrib = await ask("Contributors: ");
-  let link = await ask("Link: ");
-
-  return new Study({
-    id: studyId,
-    name: studyName,
-    type: studyType,
-    effectScale: effectScaleEnum,
-    people: contrib,
-    link: link,
   });
+};
+
+function getDefaultParams(table: string) {
+  let key = Object.keys(Table.getTables()).filter(v => table === v);
+  if (key.length == 1) {
+    return (<any>parsingConfig)[table];
+  }
+  return {};
 }
 
-async function parseYield(): Promise<Parser> {
-  let study = await askStudy(fYield.TableName);
-  let defaultSettings = parsingConfig.yieldParams;
+function getParser(table: string) {
+  let key = Object.keys(Table.getTables()).filter(v => table === v);
+  if (key.length == 1) {
+    return PaperParsers[table];
+  }
+  return null;
+}
 
-  let parseYieldParams: any = {
-    studyDef: study,
+async function parsePaper(table: string): Promise<Parser> {
+  let importID = await ask("Import ID: ");
+  let defaultSettings = getDefaultParams(table);
+
+  let paperParams = {
+    importID: importID,
     ... defaultSettings
   };
-
-  parseYieldParams = await modifyParams(parseYieldParams);
+  await modifyParams(paperParams);
 
   // Create parser and return it
-  return new YieldParser(parseYieldParams);
+  return <Parser> new (<any>getParser(table)) (paperParams);
 }
 
 async function modifyParams(params: any) {
@@ -81,7 +106,7 @@ async function modifyParams(params: any) {
       return false;
     });
 
-    if (posn[lastMember] !== undefined) {
+    if (posn[lastMember] !== undefined || list.length) {
       // modify config
       posn[lastMember] = await ask("Value: ");
     } else if (cleanAns === "r" || cleanAns === "" || cleanAns == "q") {
@@ -94,7 +119,7 @@ async function modifyParams(params: any) {
 }
 
 async function parseIntervention(): Promise<Parser> {
-  let defaultSettings = parsingConfig.interventionParams;
+  let defaultSettings = parsingConfig.intervention;
 
   let parseInterventionParams: any = {
     ... defaultSettings
@@ -103,32 +128,6 @@ async function parseIntervention(): Promise<Parser> {
   parseInterventionParams = await modifyParams(parseInterventionParams);
   // Create parser and return it
   return new InterventionParser(parseInterventionParams);
-}
-
-async function run() {
-  while (true) {
-    // Ask what type of parser we would like to execute
-    console.log("Options are: \n yield \n intervention \n ...")
-    let ans = await ask("What type of dataset? [yield, ...] ");
-    let parser: Parser;
-    switch (ans) {
-      case "yield":
-        parser = await parseYield();
-        break;
-      case "intervention":
-        parser = await parseIntervention()
-        break;
-      default:
-        logger.error("couldn't parse answer ")
-        continue;
-    }
-
-    console.log("Running parsing operation");
-    await parser.run().then((insertedRows) => {
-      logger.info(insertedRows + " rows were inserted")
-    }).catch(err => logger.error(err));
-
-  }
 }
 
 serverBoot.db.then(function () {

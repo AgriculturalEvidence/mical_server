@@ -66,6 +66,25 @@ describe('intervention API', () => {
           }
         });
     });
+
+    it('should get valid intervention by skey', (done) => {
+      supertest(app)
+        .get('/api/intervention/' + interventionEntry.sKey)
+        .end((err: any, res: supertest.Response) => {
+          if (err) {
+            done(err);
+          } else {
+            expect(res.body.key).to.equal(interventionEntry.key);
+            expect(res.body.sKey).to.equal(interventionEntry.sKey);
+            expect(res.body.title).to.equal(interventionEntry.title);
+            expect(res.body.desc).to.equal(interventionEntry.desc);
+            expect(res.body.denom).to.equal(interventionEntry.denom);
+            expect(res.body.numerator).to.equal(interventionEntry.numerator);
+            expect(res.status).to.equal(200);
+            done();
+          }
+        });
+    });
   });
 
   describe('GET /api/intervention', () => {

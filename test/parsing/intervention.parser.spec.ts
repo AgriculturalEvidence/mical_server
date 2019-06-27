@@ -65,7 +65,39 @@ describe("Intervention", () => {
       expect(ans.length).eq(5);
 
       expect(ans[0].key).eq(1)
-    })
+    });
+
+    it("doesn't insert invalid rows with key", async () => {
+      let parseOpts = {
+        columnMapping: {
+          key: "sKey",
+          sKey: "sKey",
+          title: "title",
+          desc: "desc",
+          denom: "denom",
+          numerator: "numerator"
+        },
+        "fileName": "./test/parsing/data/intervention.csv",
+      };
+      let int = new InterventionParser(parseOpts);
+      let a = await int.run();
+      expect(a).to.be.eq(0);
+
+      parseOpts = {
+        columnMapping: {
+          key: "key",
+          sKey: "sKey",
+          title: "title",
+          desc: "desc",
+          denom: "key",
+          numerator: "numerator"
+        },
+        "fileName": "./test/parsing/data/intervention.csv",
+      };
+      int = new InterventionParser(parseOpts);
+      a = await int.run();
+      expect(a).to.be.eq(0);
+    });
 
     it ("inserts all rows" , function(done) {
       let int = new InterventionParser(parseOpts);
