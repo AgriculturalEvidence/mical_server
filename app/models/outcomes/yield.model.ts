@@ -33,15 +33,15 @@ const SchemaJSON = {
     type: Object,
     required: true,
     default: {
-      climate: "Unknown",
-      duration: "Unknown",
+      climate: 'Unknown',
+      duration: 'Unknown',
     },
   },
   infoCols: {
     type: Object,
     required: true,
     default: {
-      author: "Unknown"
+      author: 'Unknown'
     },
   }
 };

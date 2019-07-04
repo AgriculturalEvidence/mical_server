@@ -1,49 +1,49 @@
-import { logger } from "../../utils/logger";
+import { logger } from '../../utils/logger';
 
 export enum AGGREGATION_OPT {
   AVG, COUNT
 }
-export const CAPTION_OPT = ["avg", "count"];
+export const CAPTION_OPT = ['avg', 'count'];
 
 export class AggregateCalculator {
   constructor(private opt: AGGREGATION_OPT[]) {}
-  
+
   private buildProject() {
     return {
-      "effectSize": 1,
-      "sampleSize": 1,
-      "value": { $multiply: ["$effectSize", "$sampleSize"]}
-    }
+      'effectSize': 1,
+      'sampleSize': 1,
+      'value': { $multiply: ['$effectSize', '$sampleSize'] }
+    };
   }
 
-  buildGroup() {
-    let group = { 
-      "_id": "result",
-      "count": { $sum: "$sampleSize"},
-      "total": { $sum: "$value"}
+  private buildGroup() {
+    let group = {
+      '_id': 'result',
+      'count': { $sum: '$sampleSize' },
+      'total': { $sum: '$value' }
     };
     return group;
   }
 
-  build() {
+  public build() {
     let opts = [
-      { "$project": this.buildProject() },
-      { "$group": this.buildGroup() }
+      { '$project': this.buildProject() },
+      { '$group': this.buildGroup() }
     ];
-    logger.info("Aggregating with: ", opts);
+    logger.info('Aggregating with: ', opts);
     return opts;
   }
 
-  get(queryAnswer: any[]): number[] {
+  public get(queryAnswer: any[]): number[] {
     let row = queryAnswer[0];
     return this.opt.map(v => {
-      switch(v) {
-        case AGGREGATION_OPT.AVG:
-          return row.total / row.count;
-        case AGGREGATION_OPT.COUNT:
-          return row.count;
+      switch (v) {
+      case AGGREGATION_OPT.AVG:
+        return row.total / row.count;
+      case AGGREGATION_OPT.COUNT:
+        return row.count;
       }
       return 0;
-    })
+    });
   }
 }

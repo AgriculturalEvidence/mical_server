@@ -44,7 +44,7 @@ function loadAll(req: restify.Request, res: restify.Response, next: restify.Next
  * @returns {IInterventionDocument}
  */
 function get(req: restify.Request, res: restify.Response, next: restify.Next) {
-  logger.info("Answering response with ", req.params.docs.length, " rows.")
+  logger.info('Answering response with ', req.params.docs.length, ' rows.');
   res.json(200, req.params.docs);
   next();
 }
@@ -58,7 +58,7 @@ function get(req: restify.Request, res: restify.Response, next: restify.Next) {
   denom: string;
   numerator: string;
  * @property {number} req.params.key - key value of the join
- * @property {string} req.params.sKey - at parsing time we are going to match 
+ * @property {string} req.params.sKey - at parsing time we are going to match
  * the intervention types with these strings and assign them a key
  * @property {string} req.params.title - dim title
  * @property {string} req.params.desc - dim description
@@ -82,7 +82,7 @@ function create(req: restify.Request, res: restify.Response, next: restify.Next)
       res.json(200, savedEntry);
       return next();
     })
-    .catch((err: any) => {logger.error(err); next(err)});
+    .catch((err: any) => { logger.error(err); next(err); });
 }
 
 

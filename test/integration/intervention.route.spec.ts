@@ -4,15 +4,15 @@ import { expect } from 'chai';
 import { app, db } from '../../server';
 import { logger } from '../../utils/logger';
 import { Intervention } from '../../app/models/intervention.model';
-import * as mongoose from "mongoose";
+import * as mongoose from 'mongoose';
 
 const interventionEntry = {
-    key: 1,
-    sKey: "organic",
-    title: "Orgainc Effect Size",
-    desc: "How much does orgainc increase intervention",
-    denom: "Lower interventions",
-    numerator: "Higher interventions",
+  key: 1,
+  sKey: 'organic',
+  title: 'Orgainc Effect Size',
+  desc: 'How much does orgainc increase intervention',
+  denom: 'Lower interventions',
+  numerator: 'Higher interventions',
 };
 
 describe('intervention API', () => {

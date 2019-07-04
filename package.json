@@ -1,8 +1,9 @@
 {
-  "name": "MiCal",
+  "name": "mical",
   "description": "MiCal server API",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "author": "Victor Pineda",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/AgriculturalEvidence/mical_server"
@@ -31,6 +32,7 @@
     "mocha": "^6.1.4",
     "sinon": "^1.17.7",
     "supertest": "^3.4.2",
+    "ts-node": "^8.3.0",
     "tslint": "^4.2.0",
     "tslint-eslint-rules": "^3.2.3",
     "typescript": "^2.1.4"

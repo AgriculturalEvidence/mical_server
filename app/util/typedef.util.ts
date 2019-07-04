@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import {Point} from 'geojson';
+import { Point } from 'geojson';
 
 export class GeoPoint implements Point {
   public type: 'Point';
@@ -28,8 +28,8 @@ export interface IOutcomeTableDocument extends mongoose.Document, IOutcomeTableR
 
 export interface IOutcomeTableModel<T> {
   executeQuery(filters?: Object,
-                cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>>
-  executeDistinct(col: string): Promise<string[]>
+                cols?: {[col: string]: number}): Promise<Array<IOutcomeTableRow>>;
+  executeDistinct(col: string): Promise<string[]>;
   getAllInterventionTypes(): Promise<number[]>;
 }
 
@@ -41,10 +41,10 @@ export const DefaultStatistics: any = {
     * @param {Object} cols? key contains name of the column and value is whether you want it
     * @returns {Promise<Array<IYieldRow>>} Returns a Promise of the datapoints.
     */
-   executeQuery(filters?: Object, cols?: {[col: string]: number}) {
+  executeQuery(filters?: Object, cols?: {[col: string]: number}) {
     let q = this.find();
-    if (filters) q.where(filters)
-    if (cols) q.select(cols)
+    if (filters) q.where(filters);
+    if (cols) q.select(cols);
     return new Promise((a, r) => a(q.lean().exec()));
   },
 
@@ -53,9 +53,9 @@ export const DefaultStatistics: any = {
   },
 
   getAllInterventionTypes(): Promise<number[]> {
-    return new Promise((a, r) => a(this.distinct("interventionType").lean().exec()));
+    return new Promise((a, r) => a(this.distinct('interventionType').lean().exec()));
   },
-}
+};
 
 export const DefaultSchemaJSON = {
   coords: {
@@ -115,18 +115,18 @@ export interface RowData {
 // Histogram typedefs
 
 
-export type SeriesEntry = [number, number][]
+export type SeriesEntry = [number, number][];
 
 export interface Series {
-  title: string,
-  bar: SeriesEntry,
-  dist: SeriesEntry,
-  ticks: Ticks,
-  desc: string,
+  title: string;
+  bar: SeriesEntry;
+  dist: SeriesEntry;
+  ticks: Ticks;
+  desc: string;
   labels: {
     denom: string,
     numerator: string
-  }
+  };
 }
 
 export type Ticks = number[];

@@ -1,5 +1,5 @@
-import {Yield} from '../../models/outcomes/yield.model';
-import {OutcomeParser} from '../paper.parser';
+import { Yield } from '../../models/outcomes/yield.model';
+import { OutcomeParser } from '../paper.parser';
 
 interface YieldJob {
   importID: string;
@@ -21,24 +21,24 @@ class YieldParser extends OutcomeParser {
     super({
       fileName: yieldJob.fileName,
       colMapping: {
-        ...yieldJob.columnMapping, 
-        filterCols: <any> undefined, 
+        ...yieldJob.columnMapping,
+        filterCols: <any> undefined,
         infoCols: <any> undefined
       }
     });
   }
 
-  get filterCols() {return this.yieldJob.columnMapping.filterCols};
+  get filterCols() { return this.yieldJob.columnMapping.filterCols; }
   // todo vpineda
-  get infoCols() {return {}};
-  get importID() { return this.yieldJob.importID }
+  get infoCols() { return {}; }
+  get importID() { return this.yieldJob.importID; }
 
-  get model() { return Yield};
+  get model() { return Yield; }
 }
 
 function getParser(): OutcomeParser {
   return <any>YieldParser;
 }
 
-export {getParser, YieldJob, YieldParser };
+export { getParser, YieldJob, YieldParser };
 

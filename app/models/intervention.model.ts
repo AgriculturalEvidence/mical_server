@@ -13,7 +13,7 @@ interface IInterventionRow {
 }
 
 // Document interface
-interface IInterventionDocument extends mongoose.Document, IInterventionRow{}
+interface IInterventionDocument extends mongoose.Document, IInterventionRow {}
 
 // Model interface
 interface IInterventionModel extends mongoose.Model<IInterventionDocument> {
@@ -35,24 +35,24 @@ const InterventionSchema = new Schema({
   },
   title: {
     type: String,
-    default: "",
+    default: '',
     required: true,
   },
   desc: {
     type: String,
-    default: "",
+    default: '',
   },
   denom: {
     type: String,
-    default: "",
+    default: '',
   },
   numerator: {
     type: String,
-    default: "",
+    default: '',
   },
 }, {
 });
-InterventionSchema.index({ key: 1}, {unique: true});
+InterventionSchema.index({ key: 1 }, { unique: true });
 
 // Statics
 InterventionSchema.statics = {

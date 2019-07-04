@@ -16,7 +16,7 @@ let settings: LoggerSettings = {
   streams: [{ level: 'error', path: `error.log` }, { level: 'error', stream: infoStream }]
 };
 
-if (config.env === 'dev' || config.env == 'development') {
+if (config.env === 'dev' || config.env === 'development') {
   settings.streams.push({ level: 'info', stream: infoStream });
 }
 
@@ -28,10 +28,10 @@ if (config.env === 'parse') {
     stream: bunyanDebugStream({
       basepath: __dirname, // this should be the root folder of your project.
       forceColor: true
-      })
+    })
   }];
 
-  settings.serializers = bunyanDebugStream.serializers
+  settings.serializers = bunyanDebugStream.serializers;
 }
 
 if (config.debug) {

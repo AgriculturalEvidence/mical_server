@@ -18,6 +18,7 @@ export default (api: restify.Server) => {
     controller.query, histController.build);
 
   /** GET the inteventions of a given table */
-  api.get('/api/table/intervention/:table', controller.load, controller.getTableInterventions, controller.get);
+  api.get('/api/table/intervention/:table', controller.load,
+    controller.getTableInterventions, controller.get);
 
 };

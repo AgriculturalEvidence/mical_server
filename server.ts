@@ -28,7 +28,10 @@ db.then(() => {
     logger.info(`${config.name} is running at ${app.url}`);
   });
 }, (err: any) => {
-  console.log(`Unable to connect to database: ${err}, url ${config.db},opts: ${JSON.stringify(options, null , '\t')}`);
+  console.log(
+    `Unable to connect to database: ${err}, url ${config.db}, opts: 
+    ${JSON.stringify(options, null , '\t')}`
+  );
 });
 
 export { app, db };

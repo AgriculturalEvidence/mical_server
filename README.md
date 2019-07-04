@@ -1,5 +1,8 @@
-# MiCal API Server
-The API server for MiCal application
+# AEvidence API Server
+[![Build Status](https://travis-ci.com/AgriculturalEvidence/mical_server.svg?branch=master)](https://travis-ci.com/AgriculturalEvidence/mical_server)
+[![Coverage Status](https://coveralls.io/repos/github/AgriculturalEvidence/mical_server/badge.svg?branch=master)](https://coveralls.io/github/AgriculturalEvidence/mical_server?branch=master)
+
+The API server for Agricultural Evidence application
 
 ## Requirements
 

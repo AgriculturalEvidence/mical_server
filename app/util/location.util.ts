@@ -1,25 +1,25 @@
-import { DEFAULT_COORDS_COL } from "./constants.util";
-import { logger } from "../../utils/logger";
+import { DEFAULT_COORDS_COL } from './constants.util';
+import { logger } from '../../utils/logger';
 
 function buildGeometry(coords: number[][]) {
   return {
     'type' : 'Polygon',
     'coordinates' : [coords],
     crs: {
-      type: "name",
-      properties: { name: "urn:x-mongodb:crs:strictwinding:EPSG:4326" }
+      type: 'name',
+      properties: { name: 'urn:x-mongodb:crs:strictwinding:EPSG:4326' }
     }
-  }
+  };
 }
 
 function buildColWithinFilter(colName: string, coords: number[][]) {
   return {
     [colName]: {
-      "$geoWithin": {
-        "$geometry": buildGeometry(coords)
+      '$geoWithin': {
+        '$geometry': buildGeometry(coords)
       }
     }
-  }
+  };
 }
 
 /**
@@ -39,8 +39,8 @@ export function sectionCalculator(coords: number[][]) {
       if (coords[i ? (i - 1) : n - 1][0] > -180) {
         // interpolate and add point to centre left
         let prev = coords[i ? (i - 1) : n - 1];
-        let lat = (coord[1] - prev[1])/(coord[0] - prev[0])*(prev[0] + 180) + prev[1];
-        let midPoint = [-180,  lat];
+        let lat = (coord[1] - prev[1]) / (coord[0] - prev[0]) * (prev[0] + 180) + prev[1];
+        let midPoint = [-180, lat];
         left.push(midPoint);
         centre.push(midPoint);
       }
@@ -49,8 +49,8 @@ export function sectionCalculator(coords: number[][]) {
       // check next crosses boundary
       if (coords[(i + 1) % n][0] > -180) {
         let next = coords[(i + 1) % n];
-        let lat = (coord[1] - next[1])/(coord[0] - next[0])*(next[0] + 180) + next[1];
-        let midPoint = [-180,  lat];
+        let lat = (coord[1] - next[1]) / (coord[0] - next[0]) * (next[0] + 180) + next[1];
+        let midPoint = [-180, lat];
         left.push(midPoint);
         centre.push(midPoint);
       }
@@ -59,8 +59,8 @@ export function sectionCalculator(coords: number[][]) {
       if (coords[i ? (i - 1) : n - 1][0] < 180) {
         // interpolate and add point to centre left
         let prev = coords[i ? (i - 1) : n - 1];
-        let lat = (coord[1] - prev[1])/(coord[0] - prev[0])*(prev[0] - 180) + prev[1];
-        let midPoint = [180,  lat];
+        let lat = (coord[1] - prev[1]) / (coord[0] - prev[0]) * (prev[0] - 180) + prev[1];
+        let midPoint = [180, lat];
         right.push(midPoint);
         centre.push(midPoint);
       }
@@ -69,8 +69,8 @@ export function sectionCalculator(coords: number[][]) {
       // check next crosses boundary
       if (coords[(i + 1) % n][0] < 180) {
         let next = coords[(i + 1) % n];
-        let lat = (coord[1] - next[1])/(coord[0] - next[0])*(next[0] - 180) + next[1];
-        let midPoint = [180,  lat];
+        let lat = (coord[1] - next[1]) / (coord[0] - next[0]) * (next[0] - 180) + next[1];
+        let midPoint = [180, lat];
         right.push(midPoint);
         centre.push(midPoint);
       }
@@ -80,15 +80,18 @@ export function sectionCalculator(coords: number[][]) {
   }
 
   // close loops
-  if (left.length && (left[0][0] != left[left.length - 1][0] || left[0][1] != left[left.length - 1][1])) {
+  if (left.length && (left[0][0] !== left[left.length - 1][0]
+    || left[0][1] !== left[left.length - 1][1])) {
     left.push(left[0]);
   }
 
-  if (right.length && (right[0][0] != right[right.length - 1][0] || right[0][1] != right[right.length - 1][1])) {
+  if (right.length && (right[0][0] !== right[right.length - 1][0]
+    || right[0][1] !== right[right.length - 1][1])) {
     right.push(right[0]);
   }
 
-  if (centre.length && (centre[0][0] != centre[centre.length - 1][0] || centre[0][1] != centre[centre.length - 1][1])) {
+  if (centre.length && (centre[0][0] !== centre[centre.length - 1][0]
+    || centre[0][1] !== centre[centre.length - 1][1])) {
     centre.push(centre[0]);
   }
 
@@ -100,13 +103,13 @@ export function sectionCalculator(coords: number[][]) {
 }
 
 export function createAreaFilter(coords: number[][]) {
-  if(!coords || coords.length < 2) return {};
-  
+  if (!coords || coords.length < 2) return {};
+
   let sections = sectionCalculator(coords);
-  logger.info("Querying info for areas: ", JSON.stringify(sections));
-  
+  logger.info('Querying info for areas: ', JSON.stringify(sections));
+
   if (!sections.length) return {};
-  if (sections.length == 1) return buildColWithinFilter(DEFAULT_COORDS_COL, sections[0]);
+  if (sections.length === 1) return buildColWithinFilter(DEFAULT_COORDS_COL, sections[0]);
 
   return {
     $or: sections.map(s => buildColWithinFilter(DEFAULT_COORDS_COL, s))

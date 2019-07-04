@@ -29,9 +29,9 @@ function query(req: restify.Request, res: restify.Response, next: restify.Next) 
       req.params.docs = data;
       next();
     }).catch(err => {
-      logger.error("Query:", format(err));
+      logger.error('Query:', format(err));
       res.json(format(err).status, format(err).msg);
-    })
+    });
 }
 
 /**
@@ -43,12 +43,12 @@ function unique(req: restify.Request, res: restify.Response, next: restify.Next)
   Table.unique(req.params.table,
     req.params.column)
     .then((data) => {
-    req.params.docs = data;
-    next();
-  }).catch(err => {
-    logger.error("Unique:", format(err));
-    res.json(format(err).status, format(err).msg);
-  })
+      req.params.docs = data;
+      next();
+    }).catch(err => {
+      logger.error('Unique:', format(err));
+      res.json(format(err).status, format(err).msg);
+    });
 }
 
 /**
@@ -62,7 +62,7 @@ function getTableInterventions(req: restify.Request, res: restify.Response, next
       req.params.docs = interventions;
       next();
     }, (err) => {
-      logger.error("Intervention:", err);
+      logger.error('Intervention:', err);
       res.json(format(err).status, format(err).msg);
     });
 }
@@ -72,7 +72,7 @@ function getTableInterventions(req: restify.Request, res: restify.Response, next
  * @returns {IInterventionDocument}
  */
 function get(req: restify.Request, res: restify.Response, next: restify.Next) {
-  logger.info("Answering response with ", req.params.docs.length, " rows.")
+  logger.info('Answering response with ', req.params.docs.length, ' rows.');
   res.json(200, req.params.docs);
 }
 

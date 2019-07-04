@@ -37,7 +37,7 @@ const config: ConfigSettings = {
     clientSecret: process.env.GITHUB_SECRET,
     callbackURL: ''
   },
-  connOpts: { auth: { authSource: "admin" } },
+  connOpts: { auth: { authSource: 'admin' } },
 };
 
 // settings for test environment
@@ -64,8 +64,8 @@ if ( process.env.PORT ) {
 
 if ( process.env.DB_USER ) {
   config.dbUser = process.env.DB_USER;
-  if (process.env.DB_USER !== "root") {
-    config.connOpts = {}
+  if (process.env.DB_USER !== 'root') {
+    config.connOpts = {};
   }
 }
 
@@ -76,31 +76,31 @@ if ( process.env.DB_PASS ) {
 console.log(JSON.stringify(config, null, '\t'));
 
 const defaultYieldParsingParams: YieldJob = {
-  importID: "1",
-  fileName: "yield.xlsx",
+  importID: '1',
+  fileName: 'yield.xlsx',
   columnMapping: {
-    xCoords: "x",
-    yCoords: "y",
-    effectSize: "EffectSize",
-    sampleSize: "SampleSize",
-    interventionType: "intType",
+    xCoords: 'x',
+    yCoords: 'y',
+    effectSize: 'EffectSize',
+    sampleSize: 'SampleSize',
+    interventionType: 'intType',
     filterCols: {
-      author: "Author",
-      crop: "Crop type",
-      duration: "Duration of study",
-      soil: "Soil pH"
+      author: 'Author',
+      crop: 'Crop type',
+      duration: 'Duration of study',
+      soil: 'Soil pH'
     }
-  } 
+  }
 };
 const defaultInterventionParsingParams: InterventionJob = {
-  fileName: "intervention.xlsx",
+  fileName: 'intervention.xlsx',
   columnMapping: {
-    key: "key",
-    sKey: "sKey",
-    title: "title",
-    desc: "desc",
-    denom: "denom",
-    numerator: "numerator"
+    key: 'key',
+    sKey: 'sKey',
+    title: 'title',
+    desc: 'desc',
+    denom: 'denom',
+    numerator: 'numerator'
   }
 };
 

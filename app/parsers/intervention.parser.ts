@@ -26,10 +26,10 @@ class InterventionParser extends Parser {
     });
   }
 
-  get extraCols() {return {}};
-  get model() {return Intervention};
+  protected get extraCols() { return {}; }
+  protected get model() { return Intervention; }
 
-  async prepareRow(ws: WorkSheet, colInfo: ColumDesc, rowIdx: number): Promise<Object> {
+  public async prepareRow(ws: WorkSheet, colInfo: ColumDesc, rowIdx: number): Promise<Object> {
     return {
       key: ws[colInfo.key + rowIdx].v,
       sKey: ws[colInfo.sKey + rowIdx].v,
@@ -40,22 +40,22 @@ class InterventionParser extends Parser {
     };
   }
 
-  validRow(newData: any) {
+  public validRow(newData: any) {
     if (newData === null) {
       return false;
     }
-    if (isNaN(newData.key) ||  typeof newData.key !== 'number') {
+    if (isNaN(newData.key) || typeof newData.key !== 'number') {
       return false;
     }
     if (typeof newData.sKey !== 'string') {
       return false;
     }
-  
+
     if (typeof newData.title !== 'string') {
       return false;
     }
-  
-    return typeof newData.denom === 'string' && typeof newData.numerator === 'string';
+
+    return (typeof newData.denom === 'string') && (typeof newData.numerator === 'string');
   }
 }
 
