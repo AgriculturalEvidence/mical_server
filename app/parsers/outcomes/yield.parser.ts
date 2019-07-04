@@ -1,5 +1,5 @@
-import { Yield } from '../models/yield.model';
-import { PaperParser } from './paper.parser';
+import {Yield} from '../../models/outcomes/yield.model';
+import {OutcomeParser} from '../paper.parser';
 
 interface YieldJob {
   importID: string;
@@ -16,7 +16,7 @@ interface YieldJob {
   };
 }
 
-class YieldParser extends PaperParser {
+class YieldParser extends OutcomeParser {
   constructor(public yieldJob: YieldJob) {
     super({
       fileName: yieldJob.fileName,
@@ -36,5 +36,9 @@ class YieldParser extends PaperParser {
   get model() { return Yield};
 }
 
-export { YieldJob, YieldParser };
+function getParser(): OutcomeParser {
+  return <any>YieldParser;
+}
+
+export {getParser, YieldJob, YieldParser };
 

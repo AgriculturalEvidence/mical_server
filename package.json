@@ -8,6 +8,14 @@
     "url": "https://github.com/AgriculturalEvidence/mical_server"
   },
   "dependencies": {
+    "atob": "^2.1.2",
+    "bunyan-debug-stream": "^2.0.0",
+    "geojson": "^0.5.0",
+    "mongoose": "^5.6.1",
+    "restify": "^8.3.3",
+    "xlsx": "^0.14.3"
+  },
+  "devDependencies": {
     "@types/chai": "^3.5.2",
     "@types/geojson": "^7946.0.7",
     "@types/mocha": "^5.2.7",
@@ -16,16 +24,6 @@
     "@types/sinon": "^1.16.34",
     "@types/supertest": "^2.0.7",
     "@types/xlsx": "0.0.36",
-    "atob": "^2.1.2",
-    "bunyan-debug-stream": "^2.0.0",
-    "geojson": "^0.5.0",
-    "kernel-smooth": "^0.2.3",
-    "mongoose": "^5.6.1",
-    "restify": "^8.3.3",
-    "science": "^1.9.3",
-    "xlsx": "^0.14.3"
-  },
-  "devDependencies": {
     "btoa": "^1.2.1",
     "chai": "^3.5.0",
     "coveralls": "^3.0.4",
@@ -40,9 +38,9 @@
   "scripts": {
     "lint": "tslint --project .",
     "build": "node_modules/.bin/tsc",
-    "test": "npm run build && NODE_ENV='test' node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha test/**/*.spec.js",
+    "test": "npm run build && NODE_ENV='test' node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha dist/test/**/*.spec.js",
     "cover": "npm run test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "start": "npm run build && node server.js | bunyan -o short",
-    "parse": "npm run build && NODE_ENV='parse' node parse.js"
+    "start": "node dist/server.js | bunyan -o short",
+    "parse": "npm run build && NODE_ENV='parse' node dist/parse.js"
   }
 }

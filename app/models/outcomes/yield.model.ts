@@ -1,5 +1,13 @@
 import * as mongoose from 'mongoose';
-import { DefaultSchemaJSON, DefaultStatistics, GeoPoint, IOutcomeTableDocument, IOutcomeTableModel, IOutcomeTableRow } from '../util/typedef.util';
+import {
+  DefaultSchemaJSON,
+  DefaultStatistics,
+  GeoPoint,
+  IOutcomeTableDocument,
+  IOutcomeTableModel,
+  IOutcomeTableRow
+} from '../../util/typedef.util';
+
 const Schema = mongoose.Schema;
 
 // Row interface, values of each row without being a full-fledged document,
@@ -16,11 +24,7 @@ interface IYieldRow extends IOutcomeTableRow {
 interface IYieldDocument extends mongoose.Document, IOutcomeTableDocument, IYieldRow {}
 
 // Model interface
-interface IYieldModel extends mongoose.Model<IYieldDocument>, IOutcomeTableModel<IYieldDocument> {
-  executeQuery(filters?: Object,
-            cols?: {[col: string]: number}): Promise<Array<IYieldRow>>;
-  executeDistinct(col: string): Promise<string[]>;
-}
+interface IYieldModel extends mongoose.Model<IYieldDocument>, IOutcomeTableModel<IYieldDocument> {}
 
 const TableName = 'Yield';
 const SchemaJSON = {
@@ -46,7 +50,10 @@ const YieldSchema = new Schema(SchemaJSON);
 
 YieldSchema.index({ location: '2dsphere' });
 YieldSchema.statics = Object.assign({}, DefaultStatistics);
-const Yield: IYieldModel = <IYieldModel>mongoose.model(TableName, YieldSchema);
 
-export { Yield, IYieldDocument, IYieldRow, TableName, SchemaJSON };
+const Yield: IYieldModel = <IYieldModel>mongoose.model(TableName, YieldSchema);
+function getModel(): IOutcomeTableModel<IYieldDocument> {
+  return Yield;
+}
+export { getModel, Yield, IYieldDocument, IYieldRow, TableName, SchemaJSON };
 

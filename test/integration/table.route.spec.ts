@@ -3,7 +3,7 @@ import 'mocha';
 import { expect } from 'chai';
 import { app, db } from '../../server';
 import { logger } from '../../utils/logger';
-import {IYieldDocument, Yield} from '../../app/models/yield.model';
+import {IYieldDocument, Yield} from '../../app/models/outcomes/yield.model';
 import * as mongoose from "mongoose";
 import {GeoPoint, Series} from '../../app/util/typedef.util';
 import {Intervention} from '../../app/models/intervention.model';

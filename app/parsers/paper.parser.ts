@@ -1,9 +1,10 @@
 import * as mongoose from 'mongoose';
-import { WorkBook, WorkSheet } from 'xlsx';
-import { logger } from '../../utils/logger';
-import { Intervention } from '../models/intervention.model';
-import { indexToColumn, parseRef } from '../util/excel.helpers.util';
-import { IOutcomeTableRow } from '../util/typedef.util';
+import {WorkBook, WorkSheet} from 'xlsx';
+import {logger} from '../../utils/logger';
+import {Intervention} from '../models/intervention.model';
+import {indexToColumn, parseRef} from '../util/excel.helpers.util';
+import {IOutcomeTableRow} from '../util/typedef.util';
+
 const XLSX = require('xlsx');
 
 interface ParseJob {
@@ -93,7 +94,7 @@ abstract class Parser {
   }
 }
 
-abstract class PaperParser extends Parser {
+abstract class OutcomeParser extends Parser {
 
   abstract get filterCols(): {[col: string]: string};
   abstract get infoCols(): {[col: string]: string};
@@ -215,5 +216,5 @@ function flatten(obj: F, acc: {[key: string]: string} = {}) {
 }
 
 
-export { Parser, PaperParser, ParseJob, ColumDesc };
+export { Parser, OutcomeParser, ParseJob, ColumDesc };
 

@@ -4,10 +4,10 @@ import * as mongoose from 'mongoose';
 import {app} from '../../server';
 import {logger} from '../../utils/logger';
 import {Study} from '../../app/models/studies.model';
-import {YieldParser, YieldJob} from '../../app/parsers/yield.parser';
+import {YieldParser, YieldJob} from '../../app/parsers/outcomes/yield.parser';
 import {equal} from 'assert';
 import {WorkBook} from 'xlsx/types';
-import {Yield} from '../../app/models/yield.model';
+import {Yield} from '../../app/models/outcomes/yield.model';
 import {Intervention} from '../../app/models/intervention.model';
 import * as serverBoot from '../../server';
 

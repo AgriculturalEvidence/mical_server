@@ -2,25 +2,19 @@ import * as readline from 'readline';
 import * as Table from './app/models/table.model'
 import { InterventionParser } from './app/parsers/intervention.parser';
 import { Parser } from './app/parsers/paper.parser';
-import { YieldJob, YieldParser } from './app/parsers/yield.parser';
+import { YieldJob, YieldParser } from './app/parsers/outcomes/yield.parser';
 import { parsingConfig } from './config/env';
 import * as serverBoot from './server';
 import { logger } from './utils/logger';
+import {OutcomeParsingMapPromise} from './app/parsers/outcomes/outcomes.index';
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-// --------------------------------------------------------------
-// !!!!!!!!!!!!!!!!  CHANGE TABLE PARSERS HERE !!!!!!!!!!!!!!!!!
-// Add your new parser here once you've added the right model
-// to the table.model file. Note that the name must match otherwise
-// the program will not be able to know which parser to use!
-// --------------------------------------------------------------
-const PaperParsers: {[table: string]: any} = {
-  yield: YieldParser,
-}
+let PaperParsers: {[table: string]: any} = {};
+OutcomeParsingMapPromise.then((v) => PaperParsers = {...PaperParsers, ...v});
 
 
 // -----------------------------------------------
@@ -29,7 +23,7 @@ const PaperParsers: {[table: string]: any} = {
 async function run() {
   while (true) {
     // Ask what type of parser we would like to execute
-    console.log(`Options are: ${Object.keys(Table.getTables()).join("\n")}`)
+    console.log(`Options are: intervention, ${Object.keys(Table.getTables()).join("\n")}`)
     let ans = await ask("What type of dataset? [yield, ...] ");
     let parser: Parser;
 

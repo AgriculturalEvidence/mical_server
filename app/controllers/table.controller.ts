@@ -52,7 +52,7 @@ function unique(req: restify.Request, res: restify.Response, next: restify.Next)
 }
 
 /**
- * Gets all of the interventions in a given outcome table
+ * Gets all of the interventions in a given outcomes table
  * @param req.params.table the table that we want all intervention types
  */
 

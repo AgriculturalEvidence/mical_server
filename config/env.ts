@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { YieldJob } from '../app/parsers/yield.parser';
+import { YieldJob } from '../app/parsers/outcomes/yield.parser';
 import { InterventionJob } from '../app/parsers/intervention.parser';
 
 interface ConfigSettings {

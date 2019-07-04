@@ -1,23 +1,16 @@
-import { performance } from 'perf_hooks';
-import { logger } from '../../utils/logger';
-import { AggregateCalculator } from '../util/aggregation.util';
-import { ErrorCode } from '../util/errorcodes.info';
-import { createAreaFilter } from '../util/location.util';
-import { IOutcomeTableDocument, IOutcomeTableModel, IOutcomeTableRow } from '../util/typedef.util';
-import { IInterventionDocument, Intervention } from './intervention.model';
-import { Yield } from './yield.model';
+import {performance} from 'perf_hooks';
+import {logger} from '../../utils/logger';
+import {AggregateCalculator} from '../util/aggregation.util';
+import {ErrorCode} from '../util/errorcodes.info';
+import {createAreaFilter} from '../util/location.util';
+import {IOutcomeTableDocument, IOutcomeTableModel, IOutcomeTableRow} from '../util/typedef.util';
+import {IInterventionDocument, Intervention} from './intervention.model';
+import {OutcomeTableMapPromise} from './outcomes/outcomes.index';
 
 let atob = require('atob');
 
-// --------------------------------------------------------------
-// !!!!!!!!!!!!!!!!  CHANGE TABLE DEFNTIONS HERE !!!!!!!!!!!!!!!!!
-// Add your new table definitions to this object, the key should match
-// whatever request is comming in from the front-end and the object in
-// parse.ts.
-// --------------------------------------------------------------
-const TableMap: {[key: string]: IOutcomeTableModel<IOutcomeTableDocument>} = {
-  yield: Yield
-};
+let TableMap: {[key: string]: IOutcomeTableModel<IOutcomeTableDocument>} = {};
+OutcomeTableMapPromise.then((v) => TableMap = {...TableMap, ...v});
 
 
 /**

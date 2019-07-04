@@ -8,7 +8,8 @@
     "noImplicitReturns": true,
     "noImplicitAny": true,
     "preserveConstEnums": true,
-    "typeRoots": ["chai", "mocha", "mongoose", "restify", "sinon", "supertest"]
+    "typeRoots": ["chai", "mocha", "mongoose", "restify", "sinon", "supertest"],
+    "outDir": "dist"
   },
   "filesGlob": [
     "/app",
