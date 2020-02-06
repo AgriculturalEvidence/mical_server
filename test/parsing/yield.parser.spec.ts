@@ -35,6 +35,7 @@ let mockInterventions = [new Intervention({
   desc: 'How much does orgainc increase intervention',
   denom: 'Lower interventions',
   numerator: 'Higher interventions',
+  xAxisLabel: 'Log Ratio'
 }), new Intervention({
   key: 2,
   sKey: 'biodiversity',
@@ -42,6 +43,7 @@ let mockInterventions = [new Intervention({
   desc: 'How much does orgainc increase intervention',
   denom: 'Lower interventions',
   numerator: 'Higher interventions',
+  xAxisLabel: 'Log Ratio'
 })];
 
 

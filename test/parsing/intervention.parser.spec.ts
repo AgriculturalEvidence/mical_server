@@ -17,7 +17,8 @@ describe('Intervention', () => {
       title: 'title',
       desc: 'desc',
       denom: 'denom',
-      numerator: 'numerator'
+      numerator: 'numerator',
+      xAxisLabel: 'xLabel'
     },
     'fileName': './test/parsing/data/intervention.csv',
   };
@@ -47,6 +48,7 @@ describe('Intervention', () => {
         expect(cols.desc).to.be.eq('D');
         expect(cols.denom).to.be.eq('E');
         expect(cols.numerator).to.be.eq('F');
+        expect(cols.xAxisLabel).to.be.eq('G');
       });
     });
 
@@ -80,6 +82,7 @@ describe('Intervention', () => {
         desc: 'D',
         denom: 'E',
         numerator: 'F',
+        xAxisLabel: 'G'
       };
       let ans: IInterventionRow[] = await int.prepareRows(wb.Sheets[wb.SheetNames[0]], columMP);
       expect(ans.length).eq(5);
@@ -95,7 +98,8 @@ describe('Intervention', () => {
           title: 'title',
           desc: 'desc',
           denom: 'denom',
-          numerator: 'numerator'
+          numerator: 'numerator',
+          xAxisLabel: 'xLabel'
         },
         'fileName': './test/parsing/data/intervention.csv',
       };
@@ -110,7 +114,8 @@ describe('Intervention', () => {
           title: 'title',
           desc: 'desc',
           denom: 'key',
-          numerator: 'numerator'
+          numerator: 'numerator',
+          xAxisLabel: 'xLabel'
         },
         'fileName': './test/parsing/data/intervention.csv',
       };

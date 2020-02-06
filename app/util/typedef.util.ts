@@ -125,7 +125,8 @@ export interface Series {
   desc: string;
   labels: {
     denom: string,
-    numerator: string
+    numerator: string,
+    xlabel: string
   };
 }
 

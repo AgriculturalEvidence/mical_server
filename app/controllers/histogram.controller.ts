@@ -244,6 +244,7 @@ async function getSeriesMetadata(key: number): Promise<Series> {
       labels: {
         denom: interventionEntry.denom,
         numerator: interventionEntry.numerator,
+        xlabel: interventionEntry.xAxisLabel
       },
       title: interventionEntry.title,
       bar: [], dist: [], ticks: [],
@@ -254,6 +255,7 @@ async function getSeriesMetadata(key: number): Promise<Series> {
       labels: {
         denom: ServerConstants.DEFAULT_LESS_EFFECT,
         numerator: ServerConstants.DEFAULT_MORE_EFFECT,
+        xlabel: ServerConstants.DEFAULT_X_AXIS
       },
       title: ServerConstants.DEFAULT_HISTOGRAM_TITLE,
       bar: [], dist: [], ticks: [],

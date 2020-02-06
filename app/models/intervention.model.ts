@@ -50,6 +50,10 @@ const InterventionSchema = new Schema({
     type: String,
     default: '',
   },
+  xAxisLabel: {
+    type: String,
+    default: '',
+  },
 }, {
 });
 InterventionSchema.index({ key: 1 }, { unique: true });
