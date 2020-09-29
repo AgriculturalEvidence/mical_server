@@ -9,6 +9,7 @@ interface YieldJob {
     yCoords: string,
     effectSize: string,
     sampleSize: string,
+    studyId: string,
     interventionType: string,
     filterCols: {
       [key: string]: string,

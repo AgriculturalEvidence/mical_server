@@ -13,8 +13,8 @@ interface InterventionJob {
     desc: string,
     denom: string,
     numerator: string
-    xAxisLabel: string,
-    [key: string]: string,
+    // xAxisLabel: string,
+    // [key: string]: string,
   };
 }
 
@@ -38,7 +38,7 @@ class InterventionParser extends Parser {
       desc: ws[colInfo.desc + rowIdx].v,
       denom: ws[colInfo.denom + rowIdx].v,
       numerator: ws[colInfo.numerator + rowIdx].v,
-      xAxisLabel: ws[colInfo.xAxisLabel + rowIdx].v
+      // xAxisLabel: ws[colInfo.xAxisLabel + rowIdx].v
     };
   }
 

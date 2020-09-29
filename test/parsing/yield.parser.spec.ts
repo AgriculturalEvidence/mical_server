@@ -21,9 +21,14 @@ let parseOpts: YieldJob = {
     'yCoords': 'Y-coord deg',
     'effectSize': 'Yield ic 1',
     'sampleSize': 'N sc 1',
+    'studyId': 'Study#',
     'interventionType': 'intType',
     'filterCols': {
       'author': 'Author',
+      'crop': 'Crop type',
+      'duration': 'Study_Duration.new',
+      'soil': 'soils.new',
+      'climate': 'gens.new'
     },
   }
 };
@@ -167,11 +172,14 @@ describe('yield parsing integration test', function() {
         'yCoords': 'Y_coord',
         'effectSize': 'log ratio',
         'sampleSize': 'sampleSize',
+        'studyId': 'Study#',
         'interventionType': 'intType',
         'filterCols': {
+          'author': 'Author',
           'crop': 'Crop type',
           'soil': 'Soil pH',
           'duration': 'Duration of study',
+          'climate': 'gens.new'
         },
       }
     };

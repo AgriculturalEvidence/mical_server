@@ -29,7 +29,7 @@ const config: ConfigSettings = {
   debug: debug,
   root: path.join(__dirname, '/..'),
   port: 8888,
-  db: 'mongodb://localhost:27017/dev',
+  db: 'mongodb+srv://admin:admin123@cluster0.5he4u.mongodb.net/Cluster0?retryWrites=true&w=majority',
   dbUser: 'root',
   dbPass: 'example',
   github: {
@@ -77,21 +77,24 @@ console.log(JSON.stringify(config, null, '\t'));
 
 const defaultYieldParsingParams: YieldJob = {
   importID: '1',
-  fileName: 'yield.xlsx',
+  fileName: 'toupload.xlsx',
   columnMapping: {
-    xCoords: 'x',
-    yCoords: 'y',
-    effectSize: 'EffectSize',
-    sampleSize: 'SampleSize',
-    interventionType: 'intType',
-    filterCols: {
-      author: 'Author',
-      crop: 'Crop type',
-      duration: 'Duration of study',
-      soil: 'Soil pH'
-    }
+   xCoords: 'x',
+   yCoords: "y",
+   effectSize: 'effect_plot',  
+   sampleSize: 'Ncontrol.new',
+   studyId: 'Study#',
+   interventionType: 'Intervention_type.new',
+   filterCols: {
+    author: 'Author',
+    crop: 'Crop type',
+    duration: 'Study_Duration.new',
+    soil: 'soils.new',
+    climate: 'gens.new'
+   }
   }
 };
+
 const defaultInterventionParsingParams: InterventionJob = {
   fileName: 'intervention.xlsx',
   columnMapping: {
@@ -101,7 +104,7 @@ const defaultInterventionParsingParams: InterventionJob = {
     desc: 'desc',
     denom: 'denom',
     numerator: 'numerator',
-    xAxisLabel: 'xLabel'
+    // xAxisLabel: 'xLabel'
   }
 };
 
