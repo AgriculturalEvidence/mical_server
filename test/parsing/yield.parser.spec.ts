@@ -21,7 +21,7 @@ let parseOpts: YieldJob = {
     'yCoords': 'Y-coord deg',
     'effectSize': 'Yield ic 1',
     'sampleSize': 'N sc 1',
-    'studyId': 'Study#',
+    // 'studyId': 'Study#',
     'interventionType': 'intType',
     'filterCols': {
       'author': 'Author',

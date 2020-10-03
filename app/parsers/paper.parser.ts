@@ -36,6 +36,8 @@ abstract class Parser {
       let arg: {[key: string]: string} = {};
       flatten({ ...this.job.colMapping, ...this.extraCols }, arg);
       let [found, ws, cols] = Parser.findColumns(wb, arg);
+      console.log('cols is: ' + JSON.stringify(cols))
+      console.log('found: ', found)
       if (!found) {
         logger.error('Couldn\'t find all cols, aborting!');
         return 0;
@@ -74,6 +76,10 @@ abstract class Parser {
       }
       if (foundWorksheet) break;
     }
+    // console.log(columns)
+    // console.log(Object.keys(columns).length)
+    // console.log(colNames)
+    // console.log(Object.keys(colNames).length)
     return [Object.keys(columns).length === Object.keys(colNames).length,
       wb.Sheets[wbSheets[wsPtr]],
       columns];
