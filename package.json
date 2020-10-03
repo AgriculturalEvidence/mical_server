@@ -43,6 +43,6 @@
     "test": "npm run build && NODE_ENV='test' node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha dist/test/**/*.spec.js",
     "cover": "npm run test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "start": "node dist/server.js | bunyan -o short",
-    "parse": "npm run build && NODE_ENV='parse' node dist/parse.js"
+    "parse": "chmod +x parse.sh && ./parse.sh"
   }
 }

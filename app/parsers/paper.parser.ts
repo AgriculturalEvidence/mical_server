@@ -43,6 +43,7 @@ abstract class Parser {
         return 0;
       }
       let rows = await this.prepareRows(ws, cols);
+      console.log('rows: ' + JSON.stringify(rows[0]))
       if (!rows.length) return 0;
       return new Promise((resolve, reject) => {
         this.model.collection.insertMany(rows, (error, result) => {
@@ -50,6 +51,7 @@ abstract class Parser {
           resolve(result);
         });
       }).then((ans: any) => {
+        // console.log(ans);
         return ans.insertedCount;
       });
     } catch (e) {
@@ -92,7 +94,8 @@ abstract class Parser {
 
     for (let rowIdx = 2; rowIdx <= numRows; rowIdx ++) {
       let newRowPromise = this.prepareRow(ws, colInfo, rowIdx)
-        .catch(() => {
+        .catch((err) => {
+          console.log('error for row parsing: ' + err);
           return null;
         });
       rowPromises.push(newRowPromise);

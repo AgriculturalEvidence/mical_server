@@ -41,7 +41,7 @@ async function run() {
     logger.info('Running parsing operation'); 
     await parser.run().then((insertedRows) => {
       logger.info(insertedRows + ' rows were inserted');
-    }).catch(err => logger.error(err));
+    }).catch(err => logger.error(JSON.stringify(err)));
 
   }
 }
