@@ -11,6 +11,8 @@
   "dependencies": {
     "atob": "^2.1.2",
     "bunyan-debug-stream": "^2.0.0",
+    "csvtojson": "^2.0.10",
+    "fs": "0.0.1-security",
     "geojson": "^0.5.0",
     "mongoose": "^5.6.1",
     "restify": "^8.3.3",
@@ -43,6 +45,6 @@
     "test": "npm run build && NODE_ENV='test' node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha dist/test/**/*.spec.js",
     "cover": "npm run test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "start": "node dist/server.js | bunyan -o short",
-    "parse": "chmod +x parse.sh && ./parse.sh"
+    "parse": "npm run build && node dist/parsingFiles/parser.js && ./parsingFiles/parse.sh"
   }
 }
