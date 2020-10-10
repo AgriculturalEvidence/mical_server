@@ -1,3 +1,6 @@
+/**
+ * This file acts as a script which converts yields.csv to yields.json file.
+ */
 const CSVToJSON = require('csvtojson');
 const fs = require("fs");
 
@@ -18,8 +21,6 @@ CSVToJSON().fromFile(interventionCSVPath)
             let interventionTitle = intervention.sKey.replace(/\s+/g, "");
             interventionMap[interventionTitle] = intervention.key
         }
-        console.log(interventionMap);
-        console.log('Cultivar mix: ' + interventionMap['Cultivarmix']);
     })
     .catch((e: any) => {
         console.log("intervention map creation error" + e);
@@ -37,10 +38,7 @@ CSVToJSON().fromFile(yieldCSVPath)
             jsonObj['effectSize'] = yield.EffectSize_ReportedValue;
             jsonObj['sampleSize'] = yield['Ncontrol']['new'];
             jsonObj['importID'] = '1';
-            jsonObj['interventionType'] = JSON.parse(JSON.stringify(interventionMap))[String(yield['Intervention_type']['new']).replace(/\s+/, "")]; // needs revision
-            // console.log(interventionMap)
-            console.log(yield['Intervention_type']['new'])
-            console.log(jsonObj['interventionType'])
+            jsonObj['interventionType'] = JSON.parse(JSON.stringify(interventionMap))[String(yield['Intervention_type']['new']).replace(/\s+/, "")]; // removes all whitespace
 
             let filterObj: JSONType = {};
             filterObj['author'] = yield.Study_Authors;
@@ -50,10 +48,8 @@ CSVToJSON().fromFile(yieldCSVPath)
             filterObj['climate'] = yield['gens']['new'];
 
             jsonObj['filterCols'] = filterObj;
-
             jsonArray.push(jsonObj);
         }
-        // console.log(jsonArray)
 
         fs.writeFile('parsingFiles/yields.json', JSON.stringify(jsonArray), ((err: any) => {
             if(err) {
