@@ -7,7 +7,7 @@ import { logger } from './utils/logger';
 mongoose.Promise = global.Promise;
 
 // connect to mongodb
-const options = { 
+const options = {
   user: config.dbUser,
   pass: config.dbPass,
   useNewUrlParser: true,

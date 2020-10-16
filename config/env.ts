@@ -76,22 +76,21 @@ if ( process.env.DB_PASS ) {
 console.log(JSON.stringify(config, null, '\t'));
 
 const defaultYieldParsingParams: YieldJob = {
-  importID: "1",
-  fileName: "toupload.xlsx",
+  importID: '1',
+  fileName: 'toupload.xlsx',
   columnMapping: {
-   xCoords: "Study_Longitude",
-   yCoords: "Study_Latitude",
-   effectSize: "effect_plot",  
-   sampleSize: "Ncontrol.new",
-  //  studyId: "Study#",
-   interventionType: "Intervention_type.new",
-   filterCols: {
-    author: "Study_Authors",
-    crop: "Crop_Name",
-    duration: "Study_Duration.new",
-    soil: "soils.new",
-    climate: "gens.new"
-   }
+    xCoords: 'Study_Longitude',
+    yCoords: 'Study_Latitude',
+    effectSize: 'effect_plot',
+    sampleSize: 'Ncontrol.new',
+    interventionType: 'Intervention_type.new',
+    filterCols: {
+      author: 'Study_Authors',
+      crop: 'Crop_Name',
+      duration: 'Study_Duration.new',
+      soil: 'soils.new',
+      climate: 'sgens.new'
+    }
   }
 };
 

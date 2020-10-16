@@ -36,8 +36,6 @@ abstract class Parser {
       let arg: {[key: string]: string} = {};
       flatten({ ...this.job.colMapping, ...this.extraCols }, arg);
       let [found, ws, cols] = Parser.findColumns(wb, arg);
-      console.log('cols is: ' + JSON.stringify(cols))
-      console.log('found: ', found)
       if (!found) {
         logger.error('Couldn\'t find all cols, aborting!');
         return 0;
@@ -151,7 +149,7 @@ abstract class OutcomeParser extends Parser {
       let filterObj = this.getColObj(this.filterCols, ws, colInfo, rowIdx);
       let infoObj = this.getColObj(this.infoCols, ws, colInfo, rowIdx);
 
-      let returnObj:IOutcomeTableRow = {
+      let returnObj: IOutcomeTableRow = {
         coords: {
           type: 'Point',
           coordinates: [x.v, y.v],
@@ -169,7 +167,7 @@ abstract class OutcomeParser extends Parser {
     } catch (e) {
       console.log(e);
       return null;
-    }                            
+    }
   }
 
   private getColObj(colDesc: {[col: string]: string},
