@@ -41,6 +41,7 @@ abstract class Parser {
         return 0;
       }
       let rows = await this.prepareRows(ws, cols);
+      // console.log('rows: ' + JSON.stringify(rows[0]))
       if (!rows.length) return 0;
       return new Promise((resolve, reject) => {
         this.model.collection.insertMany(rows, (error, result) => {
@@ -48,6 +49,7 @@ abstract class Parser {
           resolve(result);
         });
       }).then((ans: any) => {
+        // console.log(ans);
         return ans.insertedCount;
       });
     } catch (e) {
@@ -74,6 +76,10 @@ abstract class Parser {
       }
       if (foundWorksheet) break;
     }
+    // console.log(columns)
+    // console.log(Object.keys(columns).length)
+    // console.log(colNames)
+    // console.log(Object.keys(colNames).length)
     return [Object.keys(columns).length === Object.keys(colNames).length,
       wb.Sheets[wbSheets[wsPtr]],
       columns];
@@ -82,16 +88,19 @@ abstract class Parser {
   public prepareRows(ws: WorkSheet, colInfo: ColumDesc): Promise<any[]> {
     let [_, numRows] = parseRef(ws['!ref']);
     let rowPromises = [];
-    console.log(colInfo);
+    // console.log(colInfo);
 
     for (let rowIdx = 2; rowIdx <= numRows; rowIdx ++) {
       let newRowPromise = this.prepareRow(ws, colInfo, rowIdx)
-        .catch(() => {
+        .catch((err) => {
+          console.log('error for row parsing: ' + err);
           return null;
         });
+        // console.log('ROW: ' + newRowPromise);
       rowPromises.push(newRowPromise);
     }
     return Promise.all(rowPromises).then((rows) => {
+      // console.log('ROWS: ' + rows);
       return rows.filter(v => v !== null && this.validRow(v));
     });
   }
@@ -110,47 +119,55 @@ abstract class OutcomeParser extends Parser {
   public async prepareRow(ws: WorkSheet,
                               colInfo: ColumDesc,
                               rowIdx: number): Promise<IOutcomeTableRow> {
-    let interventionRow = this.getIntervention(ws, colInfo, rowIdx);
-    let x = ws[colInfo.xCoords + rowIdx];
-    let y = ws[colInfo.yCoords + rowIdx];
-    let effS = ws[colInfo.effectSize + rowIdx];
-    let samS = ws[colInfo.sampleSize + rowIdx];
+    try {
+      let interventionRow = await this.getIntervention(ws, colInfo, rowIdx);
+      let x = ws[colInfo.xCoords + rowIdx];
+      let y = ws[colInfo.yCoords + rowIdx];
+      let effS = ws[colInfo.effectSize + rowIdx];
+      let samS = ws[colInfo.sampleSize + rowIdx];
 
-    if (!x) {
-      logger.warn(`Dropping row ${rowIdx} due to x`);
+      if (!x) {
+        logger.warn(`Dropping row ${rowIdx} due to x`);
+        return null;
+      }
+
+      if (!y) {
+        logger.warn(`Dropping row ${rowIdx} due to y`);
+        return null;
+      }
+
+      if (!effS) {
+        logger.warn(`Dropping row ${rowIdx} due to effs`);
+        return null;
+      }
+
+      if (!samS) {
+        logger.warn(`Dropping row ${rowIdx} due to sams`);
+        return null;
+      }
+
+      let filterObj = this.getColObj(this.filterCols, ws, colInfo, rowIdx);
+      let infoObj = this.getColObj(this.infoCols, ws, colInfo, rowIdx);
+
+      let returnObj: IOutcomeTableRow = {
+        coords: {
+          type: 'Point',
+          coordinates: [x.v, y.v],
+        },
+        effectSize: effS.v,
+        sampleSize: samS.v,
+        importID: this.importID,
+        interventionType: (await interventionRow).key,
+        filterCols: filterObj,
+        infoCols: infoObj
+      };
+      console.log('obj: ' + JSON.stringify(returnObj));
+
+      return returnObj;
+    } catch (e) {
+      console.log(e);
       return null;
     }
-
-    if (!y) {
-      logger.warn(`Dropping row ${rowIdx} due to y`);
-      return null;
-    }
-
-    if (!effS) {
-      logger.warn(`Dropping row ${rowIdx} due to effs`);
-      return null;
-    }
-
-    if (!samS) {
-      logger.warn(`Dropping row ${rowIdx} due to sams`);
-      return null;
-    }
-
-    let filterObj = this.getColObj(this.filterCols, ws, colInfo, rowIdx);
-    let infoObj = this.getColObj(this.infoCols, ws, colInfo, rowIdx);
-
-    return {
-      coords: {
-        type: 'Point',
-        coordinates: [x.v, y.v],
-      },
-      effectSize: effS.v,
-      sampleSize: samS.v,
-      importID: this.importID,
-      interventionType: (await interventionRow).key,
-      filterCols: filterObj,
-      infoCols: infoObj
-    };
   }
 
   private getColObj(colDesc: {[col: string]: string},
