@@ -19,7 +19,7 @@ CSVToJSON().fromFile(interventionCSVPath)
       for (let intervention of interventions) {
         // removing all whitespace from keys
         let interventionTitle = intervention.sKey.replace(/\s+/g, '');
-        interventionMap[interventionTitle] = intervention.key;
+        interventionMap[interventionTitle] = Number(intervention.key);
       }
     })
     .catch((e: any) => {
@@ -33,10 +33,10 @@ CSVToJSON().fromFile(yieldCSVPath)
         let jsonObj: JSONType = {};
         let coordsObj: JSONType = {};
         coordsObj['type'] = 'Point';
-        coordsObj['coordinates'] = [yield.Study_Longitude, yield.Study_Latitude];
+        coordsObj['coordinates'] = [Number(yield.Study_Longitude), Number(yield.Study_Latitude)];
         jsonObj['coords'] = coordsObj;
-        jsonObj['effectSize'] = yield.EffectSize_ReportedValue;
-        jsonObj['sampleSize'] = yield['Ncontrol']['new'];
+        jsonObj['effectSize'] = Number(yield.EffectSize_ReportedValue);
+        jsonObj['sampleSize'] = Number(yield['Ncontrol']['new']);
         jsonObj['importID'] = '1';
         // removes all whitespace
         jsonObj['interventionType'] = JSON.parse(JSON.stringify(interventionMap))[String(yield['Intervention_type']['new']).replace(/\s+/, '')];
