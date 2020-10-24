@@ -46,6 +46,7 @@
     "cover": "npm run test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "start": "node dist/server.js | bunyan -o short",
     "parse": "npm run build && node dist/parsingFiles/parser.js && node dist/parsingFiles/upload.js",
-    "dockerize": "cd docker/web/ && docker image build --tag=web ./ -f Dockerfile.web && cd ../server && docker image build --tag=backend ./ -f Dockerfile.server"
+    "dockerize": "cd docker/web/ && docker image build --tag=web ./ -f Dockerfile.web && cd ../server && docker image build --tag=backend ./ -f Dockerfile.server",
+    "publish": "heroku container:push --recursive -a agevc && heroku container:release web --app agevc"
   }
 }

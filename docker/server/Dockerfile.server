@@ -20,7 +20,7 @@ RUN npm install --production
 # if in dev we will expose 8888, otherwise the port will be provided
 EXPOSE 8888
 
-ENV MONGO_URL mongodb://mongo:27017/ae-db
+ENV MONGO_URL mongodb+srv://admin:admin123@cluster0.5he4u.mongodb.net/Cluster0
 ENV DB_USER admin
 ENV DB_PASS admin123 
 
