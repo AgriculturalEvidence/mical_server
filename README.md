@@ -43,7 +43,17 @@ To update new application data onto database. (Right now the parser supports int
 npm run parse
 ```
 
+3. Check Mongodb account on mongodb.com to check that the data was uploaded properly. (Ask Project head for account credentials).
+
 This runs a script that uploads the csv file to the referenced mongo database. (Note for interventions.csv it is first converted into json before uploading to db due to previous design decisions)
+
+Installing Docker
+
+Install [Docker Desktop](https://www.docker.com/products/docker-desktop) for your Operating System (Mac, PC, Linux)
+
+Installing Heroku CLI 
+
+Follow Heroku CLI installation through this [tutorial](https://devcenter.heroku.com/articles/heroku-cli)
 
 ## Running the tests
 
@@ -57,14 +67,24 @@ Run npm run test
 
 ## Deployment
 
-TODO: Copy over Deploy instructions from the document. 
+Deployment of both client and server applications are done as a single docker container instance which is hosted via Heroku. The steps to deployment are outlined below.
 
-docker stack deploy -c .\stack.yml mongo
+1. Make sure you have Heroku CLI & Docker installed (follow Installing Section).
+
+2. Login into Heroku CLI with ``` heroku container:login```
+
+3. run ``` npm run dockerize ``` to create local docker images of the client and server applications. 
+
+4. Run ``` npm run publish ``` to push images into heroku docker registry as containers and release them into heroku hosting. Its possible this may not update due to something like 'The process type web was not updated, because it is already running the specified docker image.' If this happens delete the existing local docker images and rerun steps 3 and 4 again. 
+
+5. Check heroku account to see if they have been deployed properly (Ask project head for account credentials). Current url is https://agevc.herokuapp.com/
 
 ## Built With
 
 * [NodeJs](http://nodejs.org) >= 6.x 
 * [mongodb](http://mongodb.org)
+* [Heroku](https://www.heroku.com)
+* [Docker](https://www.docker.com)
 
 ## Contributors
 
