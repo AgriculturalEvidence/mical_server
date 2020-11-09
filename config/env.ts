@@ -29,7 +29,8 @@ const config: ConfigSettings = {
   debug: debug,
   root: path.join(__dirname, '/..'),
   port: 8888,
-  db: 'mongodb+srv://admin:admin123@cluster0.5he4u.mongodb.net/Cluster0',
+  // db: 'mongodb+srv://admin:admin123@cluster0.5he4u.mongodb.net/Cluster0', Original Dataset
+  db: 'mongodb+srv://admin:admin123@cluster0.5he4u.mongodb.net/TestSet', // smaller test dataset
   dbUser: 'root',
   dbPass: 'example',
   github: {

@@ -4,7 +4,7 @@
 const CSVToJSON = require('csvtojson');
 const fs = require('fs');
 
-const yieldCSVPath: string = 'parsingFiles/yields.csv';
+const yieldCSVPath: string = 'parsingFiles/trimmedyields.csv';
 const interventionCSVPath: string = 'parsingFiles/intervention.csv';
 
 interface JSONType {
@@ -39,8 +39,7 @@ CSVToJSON().fromFile(yieldCSVPath)
         jsonObj['sampleSize'] = Number(yield['Ncontrol']['new']);
         jsonObj['importID'] = '1';
         // removes all whitespace
-        jsonObj['interventionType'] = JSON.parse(JSON.stringify(interventionMap))[String(yield['Intervention_type']['new']).replace(/\s+/, '')];
-
+        jsonObj['interventionType'] = JSON.parse(JSON.stringify(interventionMap))[String(yield['Intervention_type']['new']).replace(/\s+/g, '')];
         let filterObj: JSONType = {};
         filterObj['author'] = yield.Study_Authors;
         filterObj['crop'] = yield.Crop_Name;
