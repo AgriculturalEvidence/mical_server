@@ -103,7 +103,6 @@ const defaultInterventionParsingParams: InterventionJob = {
     desc: 'desc',
     denom: 'denom',
     numerator: 'numerator',
-    // xAxisLabel: 'xLabel'
   }
 };
 
