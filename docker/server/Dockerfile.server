@@ -24,4 +24,4 @@ ENV MONGO_URL mongodb+srv://admin:admin123@cluster0.5he4u.mongodb.net/Cluster0
 ENV DB_USER admin
 ENV DB_PASS admin123 
 
-CMD node server.js
+CMD node dist/server.js
