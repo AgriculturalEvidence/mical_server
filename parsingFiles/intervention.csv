@@ -1,14 +1,14 @@
-key,sKey,title,desc,denom,numerator
-10,GMO,GMO vs non-GMO,"On average, GMOs where ${avg} %{less|more} effective compared to non-GMOs",Non-GMO yields better,GMO yields better
-11,Intercrop,Intercrop vs Monocrop,"On average, using intercrops were ${avg} %{less|more} effective compared to monocultures.",Monocrop yields better,Intercrop yields better
-12,Organic,Organic vs Conventional,"Organic was, on average, ${avg} %{less|more} effective compared to convetional",Conventional yields better,Organic yields better
-13,No-Till,No-Till vs Till,"On average, using till gave a ${avg} yield compared to not using it ",Till yields better,No-Till yields better
-14,Biochar,Biochar vs Non-biochar,"On average, using biochar was ${avg} %{less|more} effective compared to not using it",Non-biochar yields better,Biochar yields better
-15,Biofertilization,Biofertilization vs No-Biofertilization,"On average, using biofertilizers was ${avg} %{less|more} effective compared to not using it",Non-Biofertilization better,Biofertilization better
-16,Intercrop focal,Intercrop vs Monocrop (focal),"On average, using intercrops were ${avg} %{less|more} effective compared to monocultures.",Monocrop yields better,Intercrop yields better
-17,Parkland,Agro-forestry vs Non- Agroforestry,"On average, using agroforestry was ${avg} %{less|more} effective than not.",Monocrop yields better,Agroforestry yields better
-18,Organic fertilizer substitution,Organic fertilizer vs. Synthetic fertilizer,"On average, using organic fertilizer was ${avg} %{less|more} effective than synthetic..",Synthetic yields better,Organic yields better
-19,Woody ammendement,Wood ammendement vs. None,"On average, using wood ammendments was ${avg} %{less|more} effective than not using them.",Control yields better,Wood yields better 
-20,Alternative fertilizer,Alternative fertilizer vs. Synthetic fertilizer,"On average, using alternative fertilizer was ${avg} %{less|more} effective than synthetic..",Synthetic yields better,Alternative yields better
-21,Cultivar mix,Genetic diversity vs monculture,"On average, using  diverse cultivar mixes was ${avg} %{less|more} effective compared to monocultures.",Monocrop yields better,Cultivar mix yields better
-22,Weed suppression intercropping,Intercrop vs Monocrop (weedl),"On average, using intercrops were ${avg} %{less|more} effective compared to monocultures.",Monocrop yields better,Intercrop yields better
+key,sKey,title,desc,denom,numerator,xaxis
+10,GMO,GMO vs Non-GMO,"On average, GMOs where ${avg} %{less|more} effective compared to non-GMOs",Non-GMO yields better,GMO yields better,Percent Difference
+11,Intercrop,Intercrop vs Monocrop,"On average, using intercrops were ${avg} %{less|more} effective compared to monocultures.",Monocrop yields better,Intercrop yields better,Land Equivilant Ratio
+12,Organic,Organic vs Conventional,"Organic was, on average, ${avg} %{less|more} effective compared to convetional",Conventional yields better,Organic yields better,Log Ratio
+13,No-Till,No-Till vs Till,"On average, using no-till was ${avg} %{less|more} effective compared to not using it",Till yields better,No-Till yields better,Log Ratio
+14,Biochar,Biochar vs Non-biochar,"On average, using biochar was ${avg} %{less|more} effective compared to not using it",Non-biochar yields better,Biochar yields better,Log Ratio
+15,Biofertilization,Biofertilization vs No-Biofertilization,"On average, using biofertilizers was ${avg} %{less|more} effective compared to not using it",Non-Biofertilization better,Biofertilization better,Log Ratio
+16,Intercrop Focal,Intercrop vs Monocrop (focal),"On average, using intercrops were ${avg} %{less|more} effective compared to monocultures.",Monocrop yields better,Intercrop yields better,Land Equivilant Ratio
+17,Parkland,Agroforestry vs Non- Agroforestry,"On average, using agroforestry was ${avg} %{less|more} effective than not.",Monocrop yields better,Agroforestry yields better,Log Ratio
+18,Organic Fertilizer Substitution,Organic Fertilizer vs Synthetic Fertilizer,"On average, using organic fertilizer was ${avg} %{less|more} effective than synthetic..",Synthetic yields better,Organic yields better,Log Ratio
+19,Woody Ammendement,Wood Ammendement vs None,"On average, using wood ammendments was ${avg} %{less|more} effective than not using them.",Control yields better,Wood yields better ,Log Ratio
+20,Alternative Fertilizer,Alternative Fertilizer vs Synthetic Fertilizer,"On average, using alternative fertilizer was ${avg} %{less|more} effective than synthetic..",Synthetic yields better,Alternative yields better,Log Ratio
+21,Cultivar Mix,Genetic Diversity vs Monculture,"On average, using  diverse cultivar mixes was ${avg} %{less|more} effective compared to monocultures.",Monocrop yields better,Cultivar mix yields better,Log Ratio
+22,Weed suppression Intercropping,Intercrop vs Monocrop (weed),"On average, using intercrops were ${avg} %{less|more} effective compared to monocultures.",Monocrop yields better,Intercrop yields better,Land Equivilant Ratio

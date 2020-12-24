@@ -40,8 +40,7 @@ function query(req: restify.Request, res: restify.Response, next: restify.Next) 
  * @param req.param.column the column that we will use
  */
 function unique(req: restify.Request, res: restify.Response, next: restify.Next) {
-  Table.unique(req.params.table,
-    req.params.column)
+  Table.unique(req.params.table, req.params.column)
     .then((data) => {
       req.params.docs = data;
       next();

@@ -45,7 +45,8 @@
     "test": "npm run build && NODE_ENV='test' node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha dist/test/**/*.spec.js",
     "cover": "npm run test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "start": "npm run lint && npm run build && node dist/server.js | bunyan -o short",
-    "parse": "npm run build && node dist/parsingFiles/parser.js && node dist/parsingFiles/upload.js",
-    "publish": "heroku container:push --recursive -a agevc && heroku container:release web --app agevc && heroku container:release server -a agevbackend"
+    "parse": "npm run build && node dist/parsingFiles/upload.js",
+    "deploy-client": "cd docker/web && heroku container:push --recursive -a agevc && heroku container:release web -a agevc && cd ../..",
+    "deploy-server": "cd docker/server && heroku container:push --recursive -a agevserver && heroku container:release web -a agevserver && cd ../.."
   }
 }

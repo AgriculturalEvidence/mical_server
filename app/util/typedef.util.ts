@@ -14,13 +14,18 @@ export class GeoPoint implements Point {
 // Row interface, values of each row without being a full-fledged document,
 // helpful when querying a lot of data
 export interface IOutcomeTableRow {
-  coords: GeoPoint;
-  importID: string;
-  interventionType: number;
+  studyLatitude: number;
+  studyLongitude: number;
+  Country: string;
   effectSize: number;
   sampleSize: number;
-  filterCols: {[key: string]: string};
-  infoCols: {[key: string]: string};
+  interventionType: number;
+  author: string
+  crop: string
+  crop2: string
+  duration: string
+  soil: string
+  climate: string
 }
 
 export interface IOutcomeTableDocument extends mongoose.Document, IOutcomeTableRow {

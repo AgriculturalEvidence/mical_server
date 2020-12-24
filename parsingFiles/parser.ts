@@ -12,9 +12,11 @@ interface JSONType {
 }
 
 let interventionMap: JSONType = {};
+let converter = CSVToJSON()
 
 console.log('Creating interventionMap');
-CSVToJSON().fromFile(interventionCSVPath)
+
+converter.fromFile(interventionCSVPath)
     .then((interventions: any) => {
       for (let intervention of interventions) {
         // removing all whitespace from keys
@@ -26,7 +28,7 @@ CSVToJSON().fromFile(interventionCSVPath)
       console.log('intervention map creation error' + e);
     });
 // Script that converts yields.csv to yields.json with proper headers
-CSVToJSON().fromFile(yieldCSVPath)
+converter.fromFile(yieldCSVPath)
     .then((yields: any) => {
       let jsonArray = [];
       for (let yield of yields) {
@@ -54,11 +56,11 @@ CSVToJSON().fromFile(yieldCSVPath)
 
       fs.writeFile('parsingFiles/yields.json', JSON.stringify(jsonArray), ((err: any) => {
         if (err) {
-          console.log(err);
+          console.log('Error creating yields.json ' + err);
         } else {
           console.log('Output saved to parsingFiles/yields.json.');
         }
       }));
     }).catch((err: any) => {
-      console.log(err);
+      console.log('error occured at: ' + err);
     });

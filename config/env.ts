@@ -1,6 +1,6 @@
 import * as path from 'path';
-import { YieldJob } from '../app/parsers/outcomes/yield.parser';
-import { InterventionJob } from '../app/parsers/intervention.parser';
+// import { YieldJob } from '../app/parsers/outcomes/yield.parser';
+// import { InterventionJob } from '../app/parsers/intervention.parser';
 
 interface ConfigSettings {
   root: string;
@@ -75,40 +75,40 @@ if ( process.env.DB_PASS ) {
 
 console.log(JSON.stringify(config, null, '\t'));
 
-const defaultYieldParsingParams: YieldJob = {
-  importID: '1',
-  fileName: 'toupload.xlsx',
-  columnMapping: {
-    xCoords: 'Study_Longitude',
-    yCoords: 'Study_Latitude',
-    effectSize: 'effect_plot',
-    sampleSize: 'Ncontrol.new',
-    interventionType: 'Intervention_type.new',
-    filterCols: {
-      author: 'Study_Authors',
-      crop: 'Crop_Name',
-      duration: 'Study_Duration.new',
-      soil: 'soils.new',
-      climate: 'sgens.new'
-    }
-  }
-};
+// const defaultYieldParsingParams: YieldJob = {
+//   importID: '1',
+//   fileName: 'toupload.xlsx',
+//   columnMapping: {
+//     xCoords: 'Study_Longitude',
+//     yCoords: 'Study_Latitude',
+//     effectSize: 'effect_plot',
+//     sampleSize: 'Ncontrol.new',
+//     interventionType: 'Intervention_type.new',
+//     filterCols: {
+//       author: 'Study_Authors',
+//       crop: 'Crop_Name',
+//       duration: 'Study_Duration.new',
+//       soil: 'soils.new',
+//       climate: 'sgens.new'
+//     }
+//   }
+// };
 
-const defaultInterventionParsingParams: InterventionJob = {
-  fileName: 'intervention.xlsx',
-  columnMapping: {
-    key: 'key',
-    sKey: 'sKey',
-    title: 'title',
-    desc: 'desc',
-    denom: 'denom',
-    numerator: 'numerator',
-  }
-};
+// const defaultInterventionParsingParams: InterventionJob = {
+//   fileName: 'intervention.xlsx',
+//   columnMapping: {
+//     key: 'key',
+//     sKey: 'sKey',
+//     title: 'title',
+//     desc: 'desc',
+//     denom: 'denom',
+//     numerator: 'numerator',
+//   }
+// };
 
-const parsingConfig = {
-  yield: defaultYieldParsingParams,
-  intervention: defaultInterventionParsingParams
-};
+// const parsingConfig = {
+//   yield: defaultYieldParsingParams,
+//   intervention: defaultInterventionParsingParams
+// };
 
-export { config, parsingConfig };
+export { config };
