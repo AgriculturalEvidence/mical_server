@@ -75,7 +75,8 @@ Deployment of both client and server applications are done as a single docker co
 
 2. Login into Heroku CLI with ``` heroku container:login```
 
-3. Run ``` npm run publish ``` to create local docker images of the client and server applications and push images into heroku docker registry as containers and release them into heroku hosting. Its possible this may not update due to something like 'The process type web was not updated, because it is already running the specified docker image.' If this happens delete the existing local docker images and rerun steps 3 and 4 again. 
+3. Run ``` npm run deploy-client ``` and ```npm run deploy-server``` to create local docker images of the client and server applications and push images into heroku docker registry as containers and release them into heroku hosting. Its possible this may not update due to something like 'The process type web was not updated, because it is already running the specified docker image.' 
+If this happens delete the existing local docker images with ```docker system prune``` and rerun steps 3 and 4 again. 
 
 4. If server instance gives an error of H14: No web dynos running, Run ```heroku ps:scale web=1 <server-url>```.  
 
