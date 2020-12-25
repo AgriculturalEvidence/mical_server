@@ -16,7 +16,7 @@ export class GeoPoint implements Point {
 export interface IOutcomeTableRow {
   studyLatitude: number;
   studyLongitude: number;
-  Country: string;
+  country: string;
   effectSize: number;
   sampleSize: number;
   interventionType: number;

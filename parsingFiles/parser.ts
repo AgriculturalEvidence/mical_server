@@ -14,42 +14,29 @@ interface JSONType {
 let interventionMap: JSONType = {};
 let converter = CSVToJSON()
 
-console.log('Creating interventionMap');
-
-converter.fromFile(interventionCSVPath)
-    .then((interventions: any) => {
-      for (let intervention of interventions) {
-        // removing all whitespace from keys
-        let interventionTitle = intervention.sKey.replace(/\s+/g, '');
-        interventionMap[interventionTitle] = Number(intervention.key);
-      }
-    })
-    .catch((e: any) => {
-      console.log('intervention map creation error' + e);
-    });
 // Script that converts yields.csv to yields.json with proper headers
 converter.fromFile(yieldCSVPath)
     .then((yields: any) => {
       let jsonArray = [];
       for (let yield of yields) {
-        let jsonObj: JSONType = {};
-        let coordsObj: JSONType = {};
+        let jsonObj:JSONType = {};
+        let coordsObj:JSONType = {};
+
         coordsObj['type'] = 'Point';
-        coordsObj['coordinates'] = [Number(yield.Study_Longitude), Number(yield.Study_Latitude)];
+        coordsObj['coordinates'] = [Number(yield.studyLongitude), Number(yield.studyLatitude)];
         jsonObj['coords'] = coordsObj;
-        jsonObj['effectSize'] = Number(yield.EffectSize_ReportedValue);
-        jsonObj['sampleSize'] = Number(yield['Ncontrol']['new']);
-        jsonObj['importID'] = '1';
-        // removes all whitespace
-        jsonObj['interventionType'] = JSON.parse(JSON.stringify(interventionMap))[String(yield['Intervention_type']['new']).replace(/\s+/, '')];
+        jsonObj['effectSize'] = Number(yield.effectSize);
+        jsonObj['sampleSize'] = Number(yield.sampleSize);
+        jsonObj['country'] = yield.country;
+        jsonObj['interventionType'] = Number(yield.interventionType)
 
-        let filterObj: JSONType = {};
-        filterObj['author'] = yield.Study_Authors;
-        filterObj['crop'] = yield.Crop_Name;
-        filterObj['duration'] = yield['Study_Duration']['new'];
-        filterObj['soil'] = yield['soils']['new'];
-        filterObj['climate'] = yield['gens']['new'];
-
+        let filterObj:JSONType = {};
+        filterObj['author'] = yield.author;
+        filterObj['crop'] = yield.crop;
+        filterObj['crop2'] = yield.crop2;
+        filterObj['duration'] = yield.duration;
+        filterObj['soil'] = yield.soil;
+        filterObj['climate'] = yield.climate;
         jsonObj['filterCols'] = filterObj;
         jsonArray.push(jsonObj);
       }

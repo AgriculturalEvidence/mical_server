@@ -9,7 +9,7 @@ const interventionImportScript = 'mongoimport --uri ' + config.db +
   ' --collection interventions --drop --type csv --headerline --file parsingFiles/intervention.csv';
 
 const yieldsImportScript = 'mongoimport --uri ' + config.db +
-  ' --collection yields --drop --type csv --headerline --file parsingFiles/yields.csv';
+  ' --collection yields --drop --type json --jsonArray --file parsingFiles/yields.json';
 
 // create more exec functions for creating future imports to mongo!
 exec(interventionImportScript, (error, stdout, stderr) => {
