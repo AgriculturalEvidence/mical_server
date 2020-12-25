@@ -35,6 +35,8 @@ The app will run locally on the url http://localhost:8888
 
 To update new application data onto database. (Right now the parser supports intervention data and yields data)
 
+Ensure you have [MongoImport](https://docs.mongodb.com/database-tools/installation/installation/) CLI installed as this application uses it to push datasets into mongoDB database.
+
 1. Replace the csv dataset with the new dataset. (Make sure the dataset you are replacing has the same name eg. 'intervention.csv')
 
 2. Run 
@@ -73,9 +75,9 @@ Deployment of both client and server applications are done as a single docker co
 
 2. Login into Heroku CLI with ``` heroku container:login```
 
-3. run ``` npm run dockerize ``` to create local docker images of the client and server applications. 
+3. Run ``` npm run publish ``` to create local docker images of the client and server applications and push images into heroku docker registry as containers and release them into heroku hosting. Its possible this may not update due to something like 'The process type web was not updated, because it is already running the specified docker image.' If this happens delete the existing local docker images and rerun steps 3 and 4 again. 
 
-4. Run ``` npm run publish ``` to push images into heroku docker registry as containers and release them into heroku hosting. Its possible this may not update due to something like 'The process type web was not updated, because it is already running the specified docker image.' If this happens delete the existing local docker images and rerun steps 3 and 4 again. 
+4. If server instance gives an error of H14: No web dynos running, Run ```heroku ps:scale web=1 <server-url>```.  
 
 5. Check heroku account to see if they have been deployed properly (Ask project head for account credentials). Current url is https://agevc.herokuapp.com/
 
