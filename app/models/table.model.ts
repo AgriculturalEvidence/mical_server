@@ -67,14 +67,13 @@ export async function query(tableStr: string, coords: number[][],
 
   logger.trace('Query took: ' + (performance.now() - startT) + ' millis');
 
-  if (ans && ans.length) {
-    return ans;
-  }
-  return Promise.reject({
-    code: ErrorCode.NO_DATA_FOR_STUDY,
-    filters: filters,
-    table: tableStr
-  });
+  return ans;
+
+  // return Promise.reject({
+  //   code: ErrorCode.NO_DATA_FOR_STUDY,
+  //   filters: filters,
+  //   table: tableStr
+  // });
 }
 
 /**
