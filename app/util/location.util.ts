@@ -106,7 +106,7 @@ export function createAreaFilter(coords: number[][]) {
   if (!coords || coords.length < 2) return {};
 
   let sections = sectionCalculator(coords);
-  logger.info('Querying info for areas: ', JSON.stringify(sections));
+  // logger.info('Querying info for areas: ', JSON.stringify(sections));
 
   if (!sections.length) return {};
   if (sections.length === 1) return buildColWithinFilter(DEFAULT_COORDS_COL, sections[0]);

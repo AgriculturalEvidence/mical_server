@@ -36,14 +36,19 @@ export class AggregateCalculator {
 
   public get(queryAnswer: any[]): number[] {
     let row = queryAnswer[0];
-    return this.opt.map(v => {
-      switch (v) {
-      case AGGREGATION_OPT.AVG:
-        return row.total / row.count;
-      case AGGREGATION_OPT.COUNT:
-        return row.count;
-      }
-      return 0;
-    });
+    try {
+      return this.opt.map(v => {
+        switch (v) {
+          case AGGREGATION_OPT.AVG:
+            return row.total / row.count;
+          case AGGREGATION_OPT.COUNT:
+            return row.count;
+        }
+        return 0;
+      });
+    } catch (e) {
+      throw 'histogram is empty'
+    }
+
   }
 }

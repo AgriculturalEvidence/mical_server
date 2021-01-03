@@ -34,8 +34,13 @@ function build(req: restify.Request, res: restify.Response, next: restify.Next) 
     s.desc = await sCaptionPromise;
     res.json(200, s);
   }).catch(err => {
-    logger.error('Histogram build: ', err);
-    res.json(format(err).status, format(err).msg);
+    if (err == 'histogram is empty') {
+      res.json(200, null);
+    }
+    else {
+      logger.error('Histogram build: ', err);
+      res.json(format(err).status, format(err).msg);
+    }
   });
 }
 
@@ -216,6 +221,7 @@ async function processCaption(seriesInfo: Promise<Series>, req: restify.Request)
     ac, getCoordsPolygon(req.params.area),
     getQueryFilters(req.params.f, req.params.int));
   let calculated = ac.get(aggAns);
+  if (calculated === null) return null;
 
   tIdxs.forEach((tIdx, idx) => {
     let addPercent = reqCapts[idx] === AGGREGATION_OPT.AVG;
