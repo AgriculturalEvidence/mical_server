@@ -1,5 +1,7 @@
 import * as path from 'path';
-require('dotenv').config()
+const dotenv = require('dotenv').config();
+const dotenvExpand = require('dotenv-expand');
+dotenvExpand(dotenv);
 
 interface ConfigSettings {
   root: string;
