@@ -18,6 +18,8 @@ interface ConfigSettings {
   };
 }
 
+console.log(process.env);
+
 const env: string = process.env.NODE_ENV || 'development';
 const debug: any = process.env.DEBUG || false;
 
