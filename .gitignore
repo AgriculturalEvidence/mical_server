@@ -26,3 +26,6 @@ coverage/
 
 # Coveralls config (optional)
 .coveralls.yml
+
+# env variables
+.env

@@ -1,6 +1,5 @@
 import * as path from 'path';
-// import { YieldJob } from '../app/parsers/outcomes/yield.parser';
-// import { InterventionJob } from '../app/parsers/intervention.parser';
+require('dotenv').config()
 
 interface ConfigSettings {
   root: string;
@@ -28,10 +27,10 @@ const config: ConfigSettings = {
   env: env,
   debug: debug,
   root: path.join(__dirname, '/..'),
-  port: 8888,
-  db: 'mongodb+srv://admin:admin123@cluster0.5he4u.mongodb.net/Cluster0',
-  dbUser: 'root',
-  dbPass: 'example',
+  port: parseInt(process.env.PORT), // env passes PORT as a string for some reason :(
+  db: process.env.MONGODB_URI,
+  dbUser: process.env.DB_USER,
+  dbPass: process.env.DB_PASS,
   github: {
     clientID: process.env.GITHUB_CLIENTID,
     clientSecret: process.env.GITHUB_SECRET,
@@ -53,7 +52,6 @@ if (env === 'production') {
   config.debug = false;
 }
 
-
 if ( process.env.MONGO_URL ) {
   config.db = process.env.MONGO_URL;
 }
@@ -74,41 +72,5 @@ if ( process.env.DB_PASS ) {
 }
 
 console.log(JSON.stringify(config, null, '\t'));
-
-// const defaultYieldParsingParams: YieldJob = {
-//   importID: '1',
-//   fileName: 'toupload.xlsx',
-//   columnMapping: {
-//     xCoords: 'Study_Longitude',
-//     yCoords: 'Study_Latitude',
-//     effectSize: 'effect_plot',
-//     sampleSize: 'Ncontrol.new',
-//     interventionType: 'Intervention_type.new',
-//     filterCols: {
-//       author: 'Study_Authors',
-//       crop: 'Crop_Name',
-//       duration: 'Study_Duration.new',
-//       soil: 'soils.new',
-//       climate: 'sgens.new'
-//     }
-//   }
-// };
-
-// const defaultInterventionParsingParams: InterventionJob = {
-//   fileName: 'intervention.xlsx',
-//   columnMapping: {
-//     key: 'key',
-//     sKey: 'sKey',
-//     title: 'title',
-//     desc: 'desc',
-//     denom: 'denom',
-//     numerator: 'numerator',
-//   }
-// };
-
-// const parsingConfig = {
-//   yield: defaultYieldParsingParams,
-//   intervention: defaultInterventionParsingParams
-// };
 
 export { config };
