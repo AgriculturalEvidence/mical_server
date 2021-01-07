@@ -17,4 +17,7 @@ COPY --from=build /opt/server /opt/server
 WORKDIR /opt/server
 RUN npm install --production
 
+# if in dev we will expose 8888, otherwise the port will be provided
+EXPOSE 8888
+
 CMD node dist/server.js
