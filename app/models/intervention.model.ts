@@ -10,6 +10,7 @@ interface IInterventionRow {
   desc: string;
   denom: string;
   numerator: string;
+  xaxis: string;
 }
 
 // Document interface
@@ -50,7 +51,7 @@ const InterventionSchema = new Schema({
     type: String,
     default: '',
   },
-  xAxisLabel: {
+  xaxis: {
     type: String,
     default: '',
   },

@@ -153,16 +153,16 @@ export function getCoordsPolygon(str: string): number[][] {
 /**
  * Parses the filters from the request and applies them to the given query
  * @param str the encoded str with all of the filters
- * @param intTpe intervention type as integer key
+ * @param intType intervention type as integer key
  */
-export function getQueryFilters(str: string, intTpe: string): Object {
+export function getQueryFilters(str: string, intType: string): Object {
   // todo vpineda
   let ans: any = {};
   if (str !== undefined && str !== '' && str !== null) {
     let decodedStr = atob(str);
     ans = { ...ans, ...JSON.parse(decodedStr) };
   }
-  let interventionKey = parseInt(intTpe);
+  let interventionKey = parseInt(intType);
   if (!isNaN(interventionKey)) {
     ans['interventionType'] = interventionKey;
   }
