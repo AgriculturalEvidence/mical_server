@@ -28,8 +28,7 @@ converter.fromFile(yieldCSVPath)
         jsonObj['effectSize'] = Number(yield.effectSize);
         jsonObj['sampleSize'] = Number(yield.sampleSize);
         jsonObj['country'] = yield.country;
-        jsonObj['interventionType'] = yield.interventionType
-        jsonObj['interventionKey'] = Number(yield.key) 
+        jsonObj['interventionType'] = Number(yield.key) 
 
         let filterObj:JSONType = {};
         filterObj['author'] = yield.author;
