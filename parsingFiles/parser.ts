@@ -28,7 +28,8 @@ converter.fromFile(yieldCSVPath)
         jsonObj['effectSize'] = Number(yield.effectSize);
         jsonObj['sampleSize'] = Number(yield.sampleSize);
         jsonObj['country'] = yield.country;
-        jsonObj['interventionType'] = Number(yield.interventionType)
+        jsonObj['interventionType'] = yield.interventionType
+        jsonObj['interventionKey'] = Number(yield.key) 
 
         let filterObj:JSONType = {};
         filterObj['author'] = yield.author;
@@ -42,6 +43,7 @@ converter.fromFile(yieldCSVPath)
       }
 
       fs.writeFile('parsingFiles/yields.json', JSON.stringify(jsonArray), ((err: any) => {
+        console.log('parsing')
         if (err) {
           console.log('Error creating yields.json ' + err);
         } else {

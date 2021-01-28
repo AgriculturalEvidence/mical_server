@@ -58,7 +58,7 @@ export const DefaultStatistics: any = {
   },
 
   getAllInterventionTypes(): Promise<number[]> {
-    return new Promise((a, r) => a(this.distinct('interventionType').lean().exec()));
+    return new Promise((a, r) => a(this.distinct('interventionKey').lean().exec()));
   },
 };
 
