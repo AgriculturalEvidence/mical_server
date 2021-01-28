@@ -164,7 +164,7 @@ export function getQueryFilters(str: string, intType: string): Object {
   }
   let interventionKey = parseInt(intType);
   if (!isNaN(interventionKey)) {
-    ans['interventionKey'] = interventionKey;
+    ans['interventionType'] = interventionKey;
   }
   return ans;
 }
